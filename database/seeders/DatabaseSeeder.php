@@ -3,6 +3,14 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Issue;
+use App\Models\Paper;
+use App\Models\Editorial;
+use App\Models\ReviewAssignment;
+use App\Models\Review;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
@@ -11,8 +19,212 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            RoleSeeder::class,
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        // ========== 0. CLEAR EXISTING DATA ==========
+        // Hapus data yang ada (dalam urutan yang benar karena foreign keys)
+        Review::query()->delete();
+        ReviewAssignment::query()->delete();
+        Editorial::query()->delete();
+        Paper::query()->delete();
+        Issue::query()->delete();
+        User::query()->delete();
+        
+        // Hapus roles dan permissions yang ada
+        Role::query()->delete();
+        Permission::query()->delete();
+        
+        // Reset auto-increment
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        \DB::table('model_has_roles')->truncate();
+        \DB::table('model_has_permissions')->truncate();
+        \DB::table('role_has_permissions')->truncate();
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        // ========== 1. CREATE ROLES ==========
+        $roles = ['admin', 'editor', 'reviewer', 'author'];
+        foreach ($roles as $role) {
+            Role::create(['name' => $role]);
+        }
+
+        // ========== 2. CREATE USERS ==========
+        
+        // Create 1 Admin
+        $admin = User::factory()->create([
+            'name' => 'System Administrator',
+            'email' => 'admin@jurnalku.com',
+            'password' => bcrypt('password123'),
         ]);
+        $admin->assignRole('admin');
+
+        // Create 3 Editors
+        $editors = User::factory()->count(3)->create();
+        foreach ($editors as $editor) {
+            $editor->assignRole('editor');
+        }
+
+        // Create 10 Reviewers
+        $reviewers = User::factory()->count(10)->create();
+        foreach ($reviewers as $reviewer) {
+            $reviewer->assignRole('reviewer');
+        }
+
+        // Create 20 Authors
+        $authors = User::factory()->count(20)->create();
+        foreach ($authors as $author) {
+            $author->assignRole('author');
+        }
+
+        // ========== 3. CREATE ISSUES ==========
+        $issues = collect();
+
+        // Create issues manually to avoid duplicate unique constraint
+        for ($volume = 1; $volume <= 3; $volume++) {
+            for ($number = 1; $number <= 4; $number++) {
+                $year = 2019 + $volume;
+                
+                $issue = Issue::create([
+                    'volume' => $volume,
+                    'number' => $number,
+                    'year' => $year,
+                    'title' => "Journal Research - Vol. {$volume}, No. {$number} ({$year})",
+                    'description' => fake()->paragraphs(2, true),
+                    'published_date' => fake()->dateTimeBetween("{$year}-01-01", "{$year}-12-31"),
+                    'status' => fake()->randomElement(['draft', 'published', 'archived']),
+                    'editor_id' => $editors->random()->id,
+                ]);
+                
+                $issues->push($issue);
+            }
+        }
+
+        // ========== 4. CREATE EDITORIALS ==========
+        foreach ($issues as $issue) {
+            Editorial::create([
+                'title' => 'Editorial: ' . $issue->title,
+                'content' => fake()->paragraphs(10, true),
+                'issue_id' => $issue->id,
+                'author_id' => $issue->editor_id,
+                'is_published' => $issue->status === 'published',
+                'published_date' => $issue->published_date,
+            ]);
+        }
+
+        // ========== 5. CREATE PAPERS ==========
+        $papers = collect();
+        
+        for ($i = 0; $i < 50; $i++) {
+            $paper = Paper::create([
+                'title' => rtrim(fake()->sentence(6), '.'),
+                'abstract' => fake()->paragraphs(3, true),
+                'keywords' => implode(', ', fake()->words(5)),
+                'doi' => '10.1000/' . fake()->unique()->bothify('????-####'),
+                'file_path' => 'papers/' . fake()->uuid() . '.pdf',
+                'original_filename' => fake()->word() . '_paper.pdf',
+                'status' => 'submitted',
+                'author_id' => $authors->random()->id,
+                'issue_id' => null,
+                'page_from' => fake()->numberBetween(1, 100),
+                'page_to' => fake()->numberBetween(101, 300),
+                'submitted_at' => fake()->dateTimeBetween('-1 year', 'now'),
+                'reviewed_at' => null,
+                'published_at' => null,
+                'revision_count' => 0,
+            ]);
+            
+            $papers->push($paper);
+        }
+
+        // Assign some papers to issues (published papers)
+        $publishedPapers = $papers->random(15);
+        foreach ($publishedPapers as $paper) {
+            $paper->update([
+                'issue_id' => $issues->random()->id,
+                'status' => 'published',
+                'published_at' => now()->subDays(fake()->numberBetween(1, 180)),
+            ]);
+        }
+
+        // Set status for other papers
+        $statusCounts = [
+            'submitted' => 10,
+            'under_review' => 10,
+            'accepted' => 8,
+            'revision_minor' => 4,
+            'revision_major' => 3,
+        ];
+        
+        $remainingPapers = $papers->where('status', 'submitted');
+        $index = 0;
+        
+        foreach ($statusCounts as $status => $count) {
+            for ($j = 0; $j < $count; $j++) {
+                if (isset($remainingPapers[$index])) {
+                    $remainingPapers[$index]->update(['status' => $status]);
+                    $index++;
+                }
+            }
+        }
+
+        // ========== 6. CREATE REVIEW ASSIGNMENTS ==========
+        $reviewAssignments = [];
+        
+        // For papers under review or revision
+        $papersToReview = $papers->filter(function($paper) {
+            return in_array($paper->status, ['under_review', 'revision_minor', 'revision_major']);
+        });
+        
+        foreach ($papersToReview as $paper) {
+            // Assign 2-3 reviewers per paper
+            $numReviewers = fake()->numberBetween(2, 3);
+            $assignedReviewers = $reviewers->random($numReviewers);
+            
+            foreach ($assignedReviewers as $reviewer) {
+                $assignment = ReviewAssignment::create([
+                    'paper_id' => $paper->id,
+                    'reviewer_id' => $reviewer->id,
+                    'assigned_by' => $editors->random()->id,
+                    'status' => fake()->randomElement(['pending', 'completed']),
+                    'assigned_date' => fake()->dateTimeBetween('-3 months', 'now'),
+                    'due_date' => fake()->dateTimeBetween('+1 week', '+1 month'),
+                    'completed_date' => null,
+                    'editor_notes' => fake()->boolean(30) ? fake()->paragraph() : null,
+                ]);
+                
+                $reviewAssignments[] = $assignment;
+            }
+        }
+
+        // ========== 7. CREATE REVIEWS ==========
+        foreach ($reviewAssignments as $assignment) {
+            if ($assignment->status === 'completed') {
+                Review::create([
+                    'assignment_id' => $assignment->id,
+                    'comments_to_editor' => fake()->paragraphs(3, true),
+                    'comments_to_author' => fake()->paragraphs(2, true),
+                    'recommendation' => fake()->randomElement(['accept', 'minor_revision', 'major_revision', 'reject']),
+                    'attachment_path' => fake()->boolean(20) ? 'reviews/' . fake()->uuid() . '.pdf' : null,
+                    'originality_score' => fake()->numberBetween(1, 5),
+                    'contribution_score' => fake()->numberBetween(1, 5),
+                    'clarity_score' => fake()->numberBetween(1, 5),
+                    'methodology_score' => fake()->numberBetween(1, 5),
+                    'overall_score' => fake()->numberBetween(1, 5),
+                    'is_confidential' => fake()->boolean(70),
+                    'reviewed_at' => fake()->dateTimeBetween('-2 months', 'now'),
+                ]);
+            }
+        }
+
+        echo "✅ Database seeded successfully!\n";
+        echo "Total Users: " . User::count() . "\n";
+        echo "Total Issues: " . Issue::count() . "\n";
+        echo "Total Papers: " . Paper::count() . "\n";
+        echo "Total Review Assignments: " . ReviewAssignment::count() . "\n";
+        echo "Total Reviews: " . Review::count() . "\n";
+        
+        echo "\n📋 Login Credentials:\n";
+        echo "Admin: admin@jurnalku.com / password123\n";
+        echo "All other users password: password123\n";
     }
 }

@@ -94,6 +94,59 @@
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
                 </form>
+
+                @auth
+    <!-- Admin Menu -->
+    @if(auth()->user()->hasRole('admin'))
+        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                {{ __('Admin Dashboard') }}
+            </x-nav-link>
+            <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                {{ __('Users') }}
+            </x-nav-link>
+        </div>
+    @endif
+    
+    <!-- Editor Menu -->
+    @if(auth()->user()->hasRole('editor'))
+        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+            <x-nav-link :href="route('editor.dashboard')" :active="request()->routeIs('editor.*')">
+                {{ __('Editor Dashboard') }}
+            </x-nav-link>
+            <x-nav-link :href="route('editor.papers.index')" :active="request()->routeIs('editor.papers.*')">
+                {{ __('Papers') }}
+            </x-nav-link>
+            <x-nav-link :href="route('editor.issues.index')" :active="request()->routeIs('editor.issues.*')">
+                {{ __('Issues') }}
+            </x-nav-link>
+        </div>
+    @endif
+    
+    <!-- Reviewer Menu -->
+    @if(auth()->user()->hasRole('reviewer'))
+        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+            <x-nav-link :href="route('reviewer.dashboard')" :active="request()->routeIs('reviewer.*')">
+                {{ __('Reviewer Dashboard') }}
+            </x-nav-link>
+            <x-nav-link :href="route('reviewer.assignments.pending')" :active="request()->routeIs('reviewer.assignments.*')">
+                {{ __('Assignments') }}
+            </x-nav-link>
+        </div>
+    @endif
+    
+    <!-- Author Menu -->
+    @if(auth()->user()->hasRole('author'))
+        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+            <x-nav-link :href="route('author.dashboard')" :active="request()->routeIs('author.*')">
+                {{ __('Author Dashboard') }}
+            </x-nav-link>
+            <x-nav-link :href="route('author.papers.index')" :active="request()->routeIs('author.papers.*')">
+                {{ __('My Papers') }}
+            </x-nav-link>
+        </div>
+    @endif
+@endauth
             </div>
         </div>
     </div>
