@@ -172,6 +172,7 @@ class Paper extends Model
     {
         return $query->where('status', 'under_review');
     }
+<<<<<<< HEAD
 
     /**
      * Scope for published papers.
@@ -196,4 +197,6 @@ class Paper extends Model
     {
         return $query->where('status', 'accepted');
     }
+=======
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
 }

@@ -5,7 +5,10 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SystemController;
 use Illuminate\Support\Facades\Route;
 
+<<<<<<< HEAD
 // Admin Routes Group
+=======
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     
     // Admin Dashboard
@@ -18,14 +21,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('/create', [UserController::class, 'create'])->name('create');
         Route::post('/', [UserController::class, 'store'])->name('store');
+<<<<<<< HEAD
         Route::get('/{user}', function ($userId) {
             $user = \App\Models\User::with(['roles', 'papers', 'reviewAssignments'])->findOrFail($userId);
             return view('admin.users.show', compact('user'));
         })->name('show');
+=======
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
         Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
         Route::put('/{user}', [UserController::class, 'update'])->name('update');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
         Route::post('/{user}/assign-role', [UserController::class, 'assignRole'])->name('assign-role');
+<<<<<<< HEAD
         
         // Bulk Actions
         Route::post('/bulk/delete', function () {
@@ -51,10 +58,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     });
     
     // Role & Permission Management
+=======
+    });
+    
+    // Role Management
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
     Route::prefix('roles')->name('roles.')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->name('index');
         Route::get('/create', [RoleController::class, 'create'])->name('create');
         Route::post('/', [RoleController::class, 'store'])->name('store');
+<<<<<<< HEAD
         Route::get('/{role}', function ($roleId) {
             $role = \Spatie\Permission\Models\Role::with('permissions')->findOrFail($roleId);
             $users = \App\Models\User::role($role->name)->paginate(10);
@@ -79,10 +92,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
                 return back()->with('success', 'Permission created.');
             })->name('store');
         });
+=======
+        Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('edit');
+        Route::put('/{role}', [RoleController::class, 'update'])->name('update');
+        Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy');
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
     });
     
     // System Settings
     Route::prefix('system')->name('system.')->group(function () {
+<<<<<<< HEAD
         Route::get('/settings', [SystemController::class, 'index'])->name('settings');
         Route::post('/settings', [SystemController::class, 'update'])->name('update-settings');
         
@@ -186,4 +205,21 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/audit-trail', function () {
         return view('admin.audit-trail');
     })->name('audit-trail');
+=======
+        Route::get('/settings', [SystemController::class, 'index'])->name('index');
+        Route::post('/settings', [SystemController::class, 'update'])->name('update');
+        Route::get('/logs', [SystemController::class, 'logs'])->name('logs');
+        Route::get('/backup', [SystemController::class, 'backup'])->name('backup');
+    });
+    
+    // Reports
+    Route::get('/reports', function () {
+        return view('admin.reports');
+    })->name('reports');
+    
+    // Activity Logs
+    Route::get('/activities', function () {
+        return view('admin.activities');
+    })->name('activities');
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
 });

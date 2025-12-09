@@ -1,10 +1,15 @@
 <?php
 
 use App\Http\Controllers\Reviewer\AssignmentController;
+<<<<<<< HEAD
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 // Reviewer Routes Group
+=======
+use Illuminate\Support\Facades\Route;
+
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
 Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->group(function () {
     
     // Reviewer Dashboard
@@ -33,16 +38,20 @@ Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->
         
         // Download Paper
         Route::get('/{assignment}/download', [AssignmentController::class, 'downloadPaper'])->name('download-paper');
+<<<<<<< HEAD
         
         // Request Extension
         Route::post('/{assignment}/request-extension', function ($assignmentId) {
             // TODO: Implement extension request
             return back()->with('success', 'Extension request sent to editor.');
         })->name('request-extension');
+=======
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
     });
     
     // My Reviews
     Route::get('/reviews', function () {
+<<<<<<< HEAD
         $reviews = \App\Models\Review::whereHas('assignment', function($query) {
             $query->where('reviewer_id', auth()->id());
         })->with(['assignment.paper'])->paginate(15);
@@ -103,4 +112,13 @@ Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->
     Route::get('/conflict-of-interest', function () {
         return view('reviewer.conflict-of-interest');
     })->name('conflict-of-interest');
+=======
+        return view('reviewer.reviews');
+    })->name('reviews');
+    
+    // Profile as Reviewer
+    Route::get('/profile', function () {
+        return view('reviewer.profile');
+    })->name('profile');
+>>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
 });
