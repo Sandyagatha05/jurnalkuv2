@@ -1,68 +1,310 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard')
+@section('page-title', 'Admin Dashboard')
+@section('page-description', 'Manage system settings, users, and roles')
 
-@section('header')
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        <i class="fas fa-crown"></i> {{ __('Admin Dashboard') }}
-    </h2>
+@section('page-actions')
+    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+        <i class="fas fa-user-plus me-1"></i> Add User
+    </a>
 @endsection
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 bg-white border-b border-gray-200">
-                <h3 class="text-lg font-semibold mb-4">Welcome, Admin!</h3>
-                <p class="mb-4">You have full access to manage the entire journal system.</p>
+<div class="row">
+    <!-- Stats Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Users</h6>
+                        <h4 class="mb-0">{{ $stats['total_users'] ?? 0 }}</h4>
+                    </div>
+                    <div class="icon-circle bg-primary">
+                        <i class="fas fa-users text-white"></i>
+                    </div>
+                </div>
+                <a href="{{ route('admin.users.index') }}" class="small text-primary text-decoration-none">
+                    View all <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Papers</h6>
+                        <h4 class="mb-0">{{ $stats['total_papers'] ?? 0 }}</h4>
+                    </div>
+                    <div class="icon-circle bg-success">
+                        <i class="fas fa-file-alt text-white"></i>
+                    </div>
+                </div>
+                <span class="small text-muted">Across all status</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">Published Issues</h6>
+                        <h4 class="mb-0">{{ $stats['published_issues'] ?? 0 }}</h4>
+                    </div>
+                    <div class="icon-circle bg-warning">
+                        <i class="fas fa-book text-white"></i>
+                    </div>
+                </div>
+                <a href="{{ route('editor.issues.index') }}" class="small text-warning text-decoration-none">
+                    Manage issues <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">System Roles</h6>
+                        <h4 class="mb-0">{{ $stats['total_roles'] ?? 0 }}</h4>
+                    </div>
+                    <div class="icon-circle bg-info">
+                        <i class="fas fa-user-tag text-white"></i>
+                    </div>
+                </div>
+                <a href="{{ route('admin.roles.index') }}" class="small text-info text-decoration-none">
+                    Manage roles <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Quick Actions -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{{ route('admin.users.index') }}" class="card card-hover text-center p-3 text-decoration-none">
+                            <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                            <h6>Manage Users</h6>
+                            <small class="text-muted">Add, edit, or remove users</small>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <a href="{{ route('admin.roles.index') }}" class="card card-hover text-center p-3 text-decoration-none">
+                            <i class="fas fa-user-tag fa-2x text-success mb-3"></i>
+                            <h6>Manage Roles</h6>
+                            <small class="text-muted">Configure permissions</small>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <a href="{{ route('admin.system.settings') }}" class="card card-hover text-center p-3 text-decoration-none">
+                            <i class="fas fa-cog fa-2x text-warning mb-3"></i>
+                            <h6>System Settings</h6>
+                            <small class="text-muted">Configure system</small>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <a href="{{ route('admin.activities.index') }}" class="card card-hover text-center p-3 text-decoration-none">
+                            <i class="fas fa-history fa-2x text-info mb-3"></i>
+                            <h6>Activity Logs</h6>
+                            <small class="text-muted">View system logs</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent System Activity</h5>
+                <a href="{{ route('admin.activities.index') }}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                @if($recentActivities->count() > 0)
+                    <div class="list-group list-group-flush">
+                        @foreach($recentActivities as $activity)
+                            <div class="list-group-item px-0">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-user-circle text-muted fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-1">{{ $activity->description }}</h6>
+                                        <small class="text-muted">
+                                            <i class="far fa-clock me-1"></i>
+                                            {{ $activity->created_at->diffForHumans() }}
+                                            @if($activity->causer)
+                                                • By {{ $activity->causer->name }}
+                                            @endif
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-4">
+                        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No recent activity</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Statistics -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">User Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="userRoleChart" height="250"></canvas>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-blue-100 p-4 rounded">
-                        <h4 class="font-bold">Quick Stats</h4>
-                        <ul class="mt-2">
-                            <li>Users: {{ \App\Models\User::count() }}</li>
-                            <li>Issues: {{ \App\Models\Issue::count() }}</li>
-                            <li>Papers: {{ \App\Models\Paper::count() }}</li>
-                        </ul>
+                <div class="mt-4">
+                    <h6>Role Breakdown</h6>
+                    <div class="mt-3">
+                        @foreach($roleStats as $role)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>
+                                    <i class="fas fa-circle me-2" style="color: {{ $role['color'] }}"></i>
+                                    {{ ucfirst($role['name']) }}
+                                </span>
+                                <span class="fw-bold">{{ $role['count'] }}</span>
+                            </div>
+                        @endforeach
                     </div>
-                    
-                    <div class="bg-green-100 p-4 rounded">
-                        <h4 class="font-bold">System Status</h4>
-                        <p class="mt-2">All systems operational</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-server me-2"></i> System Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Database</span>
+                        <span class="badge bg-success">Connected</span>
                     </div>
-                    
-                    <div class="bg-yellow-100 p-4 rounded">
-                        <h4 class="font-bold">Recent Activity</h4>
-                        <p class="mt-2">No recent issues</p>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: 100%"></div>
                     </div>
                 </div>
                 
-                <div class="mt-8">
-                    <h4 class="font-bold mb-4">Admin Actions</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <a href="{{ route('admin.users.index') }}" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded text-center">
-                            <i class="fas fa-users fa-2x mb-2"></i>
-                            <p>Manage Users</p>
-                        </a>
-                        
-                        <a href="{{ route('admin.roles.index') }}" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded text-center">
-                            <i class="fas fa-user-tag fa-2x mb-2"></i>
-                            <p>Manage Roles</p>
-                        </a>
-                        
-                        {{-- <a href="{{ route('admin.system.settings') }}" class="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded text-center">
-                            <i class="fas fa-cog fa-2x mb-2"></i>
-                            <p>System Settings</p>
-                        </a>
-                        
-                        <a href="{{ route('admin.reports') }}" class="bg-red-500 hover:bg-red-600 text-white p-4 rounded text-center">
-                            <i class="fas fa-chart-bar fa-2x mb-2"></i>
-                            <p>View Reports</p>
-                        </a> --}}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Storage</span>
+                        <span class="badge bg-info">Normal</span>
                     </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-info" style="width: 65%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Performance</span>
+                        <span class="badge bg-success">Optimal</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: 85%"></div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Last updated: {{ now()->format('M d, Y H:i') }}
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .icon-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    
+    .border-left-primary { border-left: 4px solid #4361ee !important; }
+    .border-left-success { border-left: 4px solid #28a745 !important; }
+    .border-left-warning { border-left: 4px solid #ffc107 !important; }
+    .border-left-info { border-left: 4px solid #17a2b8 !important; }
+    
+    .card-hover {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid #e9ecef;
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // User Role Chart
+    const ctx = document.getElementById('userRoleChart').getContext('2d');
+    const userRoleChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: @json(collect($roleStats)->pluck('name')->map(fn($name) => ucfirst($name))),
+            datasets: [{
+                data: @json(collect($roleStats)->pluck('count')),
+                backgroundColor: @json(collect($roleStats)->pluck('color')),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                }
+            }
+        }
+    });
+</script>
+@endpush

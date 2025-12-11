@@ -7,6 +7,7 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
@@ -35,26 +36,23 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'roles' => 'required|array',
-            'roles.*' => 'exists:roles,id',
-            'institution' => 'nullable|string|max:255',
-            'department' => 'nullable|string|max:255',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'in:admin,editor,reviewer,author', // Ganti dengan in array
         ]);
-        
+
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'institution' => $validated['institution'] ?? null,
-            'department' => $validated['department'] ?? null,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'email_verified_at' => $request->has('email_verified') ? now() : null,
         ]);
-        
-        $user->syncRoles($request->roles);
-        
+
+        $user->assignRole($request->roles);
+
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully.');
     }
@@ -78,7 +76,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'required|array',
-            'roles.*' => 'exists:roles,id',
+            'roles.*' => 'in:admin,editor,reviewer,author', // Ganti dengan in array
             'institution' => 'nullable|string|max:255',
             'department' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',

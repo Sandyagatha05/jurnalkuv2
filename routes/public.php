@@ -58,3 +58,8 @@ Route::get('/privacy-policy', function () {
 Route::get('/terms', function () {
     return view('public.terms');
 })->name('terms');
+
+// Archive
+Route::get('/archive', function () {
+    return view('public.archive');
+})->name('archive');

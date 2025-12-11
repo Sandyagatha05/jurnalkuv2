@@ -5,6 +5,7 @@
 
 @section('content')
 <div class="container py-5">
+    <!-- Header dengan Search -->
     <div class="row mb-5">
         <div class="col-lg-8">
             <h1 class="display-5 fw-bold mb-3">Journal Issues</h1>
@@ -14,7 +15,14 @@
             </p>
         </div>
         <div class="col-lg-4 text-lg-end">
-            <form method="GET" class="d-flex">
+            <form method="GET" action="{{ route('issues.index') }}" class="d-flex">
+                <!-- Keep existing filters -->
+                @if(request()->has('year'))
+                    <input type="hidden" name="year" value="{{ request('year') }}">
+                @endif
+                @if(request()->has('volume'))
+                    <input type="hidden" name="volume" value="{{ request('volume') }}">
+                @endif
                 <input type="text" name="search" class="form-control me-2" 
                        placeholder="Search issues..." value="{{ request('search') }}">
                 <button type="submit" class="btn btn-primary">
@@ -31,29 +39,38 @@
                 <div class="card-body py-3">
                     <div class="row g-3">
                         <div class="col-md-3">
-                            <select name="year" class="form-select" onchange="this.form.submit()">
+                            <select name="year" class="form-select" id="yearFilter">
                                 <option value="">All Years</option>
-                                @foreach($years as $year)
-                                    <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>
-                                        {{ $year }}
-                                    </option>
-                                @endforeach
+                                @if(isset($years) && count($years) > 0)
+                                    @foreach($years as $year)
+                                        <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>
+                                            {{ $year }}
+                                        </option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select name="volume" class="form-select" onchange="this.form.submit()">
+                            <select name="volume" class="form-select" id="volumeFilter">
                                 <option value="">All Volumes</option>
-                                @foreach($volumes as $volume)
-                                    <option value="{{ $volume }}" {{ request('volume') == $volume ? 'selected' : '' }}>
-                                        Volume {{ $volume }}
-                                    </option>
-                                @endforeach
+                                @if(isset($volumes) && count($volumes) > 0)
+                                    @foreach($volumes as $volume)
+                                        <option value="{{ $volume }}" {{ request('volume') == $volume ? 'selected' : '' }}>
+                                            Volume {{ $volume }}
+                                        </option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                         <div class="col-md-6 text-md-end">
-                            <a href="{{ route('archive') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-archive me-2"></i> View Archive
-                            </a>
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="button" class="btn btn-outline-secondary" onclick="resetFilters()">
+                                    <i class="fas fa-sync me-2"></i> Reset Filters
+                                </button>
+                                <a href="{{ route('archive') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-archive me-2"></i> View Archive
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -129,9 +146,9 @@
                     No issues have been published yet.
                 @endif
             </p>
-            <a href="{{ route('issues.index') }}" class="btn btn-primary">
+            <button class="btn btn-primary" onclick="resetFilters()">
                 <i class="fas fa-sync me-2"></i> Clear Filters
-            </a>
+            </button>
         </div>
     @endif
 </div>
@@ -153,3 +170,80 @@
     }
 </style>
 @endsection
+
+@push('scripts')
+<script>
+    // Filter by year
+    document.getElementById('yearFilter').addEventListener('change', function() {
+        applyFilter('year', this.value);
+    });
+    
+    // Filter by volume
+    document.getElementById('volumeFilter').addEventListener('change', function() {
+        applyFilter('volume', this.value);
+    });
+    
+    // Function to apply filter
+    function applyFilter(field, value) {
+        const url = new URL(window.location.href);
+        
+        // Reset to page 1 when filtering
+        if (url.searchParams.has('page')) {
+            url.searchParams.delete('page');
+        }
+        
+        if (value) {
+            url.searchParams.set(field, value);
+        } else {
+            url.searchParams.delete(field);
+        }
+        
+        // Keep search term if exists
+        const searchTerm = "{{ request('search') }}";
+        if (searchTerm) {
+            url.searchParams.set('search', searchTerm);
+        }
+        
+        window.location.href = url.toString();
+    }
+    
+    // Reset all filters
+    function resetFilters() {
+        window.location.href = "{{ route('issues.index') }}";
+    }
+    
+    // Show active filters info
+    document.addEventListener('DOMContentLoaded', function() {
+        const yearFilter = document.getElementById('yearFilter');
+        const volumeFilter = document.getElementById('volumeFilter');
+        const searchValue = "{{ request('search') }}";
+        
+        // Add visual indicator for active filters
+        if (yearFilter.value) {
+            yearFilter.classList.add('border-primary', 'border-2');
+        }
+        if (volumeFilter.value) {
+            volumeFilter.classList.add('border-primary', 'border-2');
+        }
+        
+        // Show active filters count
+        let activeFilters = 0;
+        if (yearFilter.value) activeFilters++;
+        if (volumeFilter.value) activeFilters++;
+        if (searchValue) activeFilters++;
+        
+        if (activeFilters > 0) {
+            const filterInfo = document.createElement('div');
+            filterInfo.className = 'alert alert-info mt-3';
+            filterInfo.innerHTML = `
+                <i class="fas fa-filter me-2"></i>
+                <strong>${activeFilters} filter(s) active</strong>
+                <button class="btn btn-sm btn-outline-info ms-3" onclick="resetFilters()">
+                    Clear all
+                </button>
+            `;
+            document.querySelector('.card-body.py-3').appendChild(filterInfo);
+        }
+    });
+</script>
+@endpush

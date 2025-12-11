@@ -3,110 +3,120 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Illuminate\Http\Request;
+use App\Models\User;
 
 class RoleController extends Controller
 {
-    /**
-     * Display a listing of roles.
-     */
     public function index()
     {
-        $roles = Role::with('permissions')->paginate(20);
-        $permissions = Permission::all()->groupBy(function($permission) {
-            $parts = explode(' ', $permission->name);
-            return $parts[0] ?? 'other';
-        });
+        return redirect()->route('admin.dashboard');
+        // Jika roles kosong, buat default roles
+        if (Role::count() === 0) {
+            $this->createDefaultRoles();
+        }
         
-        return view('admin.roles.index', compact('roles', 'permissions'));
+        $roles = Role::withCount(['users', 'permissions'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('admin.roles.index', compact('roles'));
     }
 
-    /**
-     * Show the form for creating a new role.
-     */
     public function create()
     {
-        $permissions = Permission::all()->groupBy(function($permission) {
-            $parts = explode(' ', $permission->name);
-            return $parts[0] ?? 'other';
-        });
-        
+        $permissions = Permission::all();
         return view('admin.roles.create', compact('permissions'));
     }
 
-    /**
-     * Store a newly created role.
-     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
-            'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,id',
+            'guard_name' => 'required|string|max:255',
         ]);
-        
-        $role = Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
-        
+
+        $role = Role::create([
+            'name' => $request->name,
+            'guard_name' => $request->guard_name,
+        ]);
+
         if ($request->has('permissions')) {
             $role->syncPermissions($request->permissions);
         }
-        
+
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified role.
-     */
+    public function show(Role $role)
+    {
+        return view('admin.roles.show', compact('role'));
+    }
+
     public function edit(Role $role)
     {
-        $permissions = Permission::all()->groupBy(function($permission) {
-            $parts = explode(' ', $permission->name);
-            return $parts[0] ?? 'other';
-        });
-        
+        $permissions = Permission::all();
         return view('admin.roles.edit', compact('role', 'permissions'));
     }
 
-    /**
-     * Update the specified role.
-     */
     public function update(Request $request, Role $role)
     {
-        $validated = $request->validate([
+        // Prevent editing system roles name
+        $systemRoles = ['admin', 'editor', 'reviewer', 'author'];
+        
+        $request->validate([
             'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
-            'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,id',
+            'guard_name' => 'required|string|max:255',
         ]);
+
+        // Don't update name for system roles
+        if (!in_array($role->name, $systemRoles)) {
+            $role->name = $request->name;
+        }
         
-        $role->update(['name' => $validated['name']]);
-        
+        $role->guard_name = $request->guard_name;
+        $role->save();
+
         if ($request->has('permissions')) {
             $role->syncPermissions($request->permissions);
         } else {
             $role->syncPermissions([]);
         }
-        
+
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role updated successfully.');
     }
 
-    /**
-     * Remove the specified role.
-     */
     public function destroy(Role $role)
     {
-        // Prevent deleting essential roles
-        $essentialRoles = ['admin', 'editor', 'reviewer', 'author'];
-        if (in_array($role->name, $essentialRoles)) {
-            return back()->with('error', 'Cannot delete essential system roles.');
+        // Prevent deletion of system roles
+        $systemRoles = ['admin', 'editor', 'reviewer', 'author'];
+        
+        if (in_array($role->name, $systemRoles)) {
+            return redirect()->back()
+                ->with('error', 'System roles cannot be deleted.');
         }
-        
+
         $role->delete();
-        
+
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role deleted successfully.');
+    }
+
+    private function createDefaultRoles()
+    {
+        $roles = [
+            ['name' => 'admin', 'guard_name' => 'web'],
+            ['name' => 'editor', 'guard_name' => 'web'],
+            ['name' => 'reviewer', 'guard_name' => 'web'],
+            ['name' => 'author', 'guard_name' => 'web'],
+        ];
+
+        foreach ($roles as $role) {
+            Role::firstOrCreate($role);
+        }
     }
 }

@@ -21,7 +21,6 @@ class DashboardController extends Controller
         } elseif ($user->hasRole('reviewer')) {
             return redirect()->route('reviewer.dashboard');
         } elseif ($user->hasRole('author')) {
-<<<<<<< HEAD
             return $this->authorDashboard();
         }
         
@@ -104,12 +103,5 @@ class DashboardController extends Controller
             'userCount' => \App\Models\User::count(),
             'roleCount' => \Spatie\Permission\Models\Role::count(),
         ]);
-=======
-            return redirect()->route('author.dashboard');
-        }
-        
-        // Default fallback
-        return view('dashboard');
->>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
     }
 }
