@@ -200,5 +200,25 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Role Management
     Route::resource('roles', RoleController::class);
+
+        Route::prefix('roles')->name('roles.')->controller(RoleController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{role}', 'show')->name('show');
+        Route::get('/{role}/edit', 'edit')->name('edit');
+        Route::put('/{role}', 'update')->name('update');
+        Route::delete('/{role}', 'destroy')->name('destroy');
+        
+        // Permission Management
+        Route::prefix('permissions')->name('permissions.')->group(function () {
+            Route::get('/', [RoleController::class, 'permissions'])->name('index');
+            Route::post('/', [RoleController::class, 'storePermission'])->name('store');
+            Route::delete('/{permission}', [RoleController::class, 'destroyPermission'])->name('destroy');
+        });
+        
+        // Assign permissions to role
+        Route::post('/{role}/assign-permissions', [RoleController::class, 'assignPermissions'])->name('assign-permissions');
+    });
 });
 });

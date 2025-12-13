@@ -27,6 +27,9 @@ Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->
         // Submit Review
         Route::get('/{assignment}/review', [AssignmentController::class, 'review'])->name('review');
         Route::post('/{assignment}/review', [AssignmentController::class, 'submitReview'])->name('submit-review');
+
+        // Save Draft (TAMBAHKAN INI)
+        Route::post('/{assignment}/save-draft', [AssignmentController::class, 'saveDraft'])->name('save-draft');
         
         // View Paper
         Route::get('/{assignment}/paper', [AssignmentController::class, 'viewPaper'])->name('view-paper');

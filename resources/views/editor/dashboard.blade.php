@@ -1,12 +1,11 @@
 @extends('layouts.app')
 
-<<<<<<< HEAD
 @section('page-title', 'Editor Dashboard')
 @section('page-description', 'Manage papers, issues, and review process')
 
 @section('page-actions')
     <div class="btn-group">
-        <a href="{{ route('editor.papers.create') }}" class="btn btn-primary">
+        <a href="{{ route('editor.issues.create') }}" class="btn btn-primary">
             <i class="fas fa-plus-circle me-1"></i> Create Issue
         </a>
         <a href="{{ route('editor.papers.submitted') }}" class="btn btn-outline-primary">
@@ -208,73 +207,14 @@
                     <a href="{{ route('editor.papers.submitted') }}" class="btn btn-outline-success">
                         <i class="fas fa-inbox me-2"></i> Process New Submissions
                     </a>
-                    <a href="{{ route('editor.reviewers.index') }}" class="btn btn-outline-info">
-                        <i class="fas fa-users me-2"></i> Manage Reviewers
+                    <a href="{{ route('editor.reviews.pending') }}" class="btn btn-outline-warning">
+                        <i class="fas fa-clock me-2"></i> Check Pending Reviews
                     </a>
-                    <a href="{{ route('editor.reviews.overdue') }}" class="btn btn-outline-warning">
-                        <i class="fas fa-exclamation-circle me-2"></i> Check Overdue Reviews
-                    </a>
-=======
-@section('title', 'Editor Dashboard')
-
-@section('header')
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        <i class="fas fa-edit"></i> {{ __('Editor Dashboard') }}
-    </h2>
-@endsection
-
-@section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 bg-white border-b border-gray-200">
-                <h3 class="text-lg font-semibold mb-4">Welcome, Editor!</h3>
-                <p class="mb-4">Manage journal issues, papers, and review process.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-blue-100 p-4 rounded">
-                        <h4 class="font-bold">Papers Needing Attention</h4>
-                        <ul class="mt-2">
-                            <li>Submitted: {{ \App\Models\Paper::where('status', 'submitted')->count() }}</li>
-                            <li>Under Review: {{ \App\Models\Paper::where('status', 'under_review')->count() }}</li>
-                            <li>Needs Revision: {{ \App\Models\Paper::whereIn('status', ['revision_minor', 'revision_major'])->count() }}</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="bg-green-100 p-4 rounded">
-                        <h4 class="font-bold">Issue Management</h4>
-                        <ul class="mt-2">
-                            <li>Active Issues: {{ \App\Models\Issue::where('status', 'published')->count() }}</li>
-                            <li>Draft Issues: {{ \App\Models\Issue::where('status', 'draft')->count() }}</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="mt-8">
-                    <h4 class="font-bold mb-4">Editor Actions</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <a href="{{ route('editor.papers.index') }}" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded text-center">
-                            <i class="fas fa-file-alt fa-2x mb-2"></i>
-                            <p>Manage Papers</p>
-                        </a>
-                        
-                        <a href="{{ route('editor.issues.create') }}" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded text-center">
-                            <i class="fas fa-plus-circle fa-2x mb-2"></i>
-                            <p>Create Issue</p>
-                        </a>
-                        
-                        <a href="{{ route('editor.reviews.index') }}" class="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded text-center">
-                            <i class="fas fa-check-circle fa-2x mb-2"></i>
-                            <p>Review Management</p>
-                        </a>
-                    </div>
->>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
                 </div>
             </div>
         </div>
     </div>
 </div>
-<<<<<<< HEAD
 
 <style>
     .icon-circle {
@@ -292,6 +232,4 @@
     .border-left-success { border-left: 4px solid #28a745 !important; }
     .border-left-info { border-left: 4px solid #17a2b8 !important; }
 </style>
-=======
->>>>>>> 4db2fe4ab84f24aa3c590f9dee6c3428d6bfac9d
 @endsection

@@ -10,14 +10,38 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'editor'])->prefix('editor')->name('editor.')->group(function () {
     
     // Editor Dashboard
+// Editor Dashboard
+    Route::get('/overdue', [ReviewController::class, 'overdue'])->name('overdue');
     Route::get('/dashboard', function () {
-        return view('editor.dashboard');
+        // Ambil data untuk dashboard editor
+        $stats = [
+            'submitted' => \App\Models\Paper::where('status', 'submitted')->count(),
+            'under_review' => \App\Models\Paper::where('status', 'under_review')->count(),
+            'needs_decision' => \App\Models\Paper::where('status', 'under_review')
+                ->has('reviewAssignments')
+                ->count(),
+            'active_issues' => \App\Models\Issue::where('status', 'published')->count(),
+        ];
+        
+        $recentPapers = \App\Models\Paper::with('author')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+        
+        $pendingReviews = \App\Models\ReviewAssignment::with(['paper', 'reviewer'])
+            ->where('status', 'pending')
+            ->where('due_date', '>=', now())
+            ->orderBy('due_date')
+            ->take(5)
+            ->get();
+        
+        return view('editor.dashboard', compact('stats', 'recentPapers', 'pendingReviews'));
     })->name('dashboard');
     
     // Issues Management
     Route::prefix('issues')->name('issues.')->group(function () {
         Route::get('/', [IssueController::class, 'index'])->name('index');
-        Route::get('/create', [IssueController::class, 'create'])->name('create');
+        Route::get('/create', [IssueController::class, 'create'])->name('create'); // ✅ ADA
         Route::post('/', [IssueController::class, 'store'])->name('store');
         Route::get('/{issue}', [IssueController::class, 'show'])->name('show');
         Route::get('/{issue}/edit', [IssueController::class, 'edit'])->name('edit');
@@ -66,24 +90,13 @@ Route::middleware(['auth', 'editor'])->prefix('editor')->name('editor.')->group(
         
         // Change Status
         Route::post('/{paper}/status', [PaperController::class, 'updateStatus'])->name('update-status');
-    });
-    
-    // Reviews Management
-    Route::prefix('reviews')->name('reviews.')->group(function () {
-        Route::get('/', [ReviewController::class, 'index'])->name('index');
-        Route::get('/pending', [ReviewController::class, 'pending'])->name('pending');
-        Route::get('/completed', [ReviewController::class, 'completed'])->name('completed');
-        Route::get('/overdue', [ReviewController::class, 'overdue'])->name('overdue');
-        Route::get('/{review}', [ReviewController::class, 'show'])->name('show');
         
-        // Review Assignment Management
-        Route::post('/assignments/{assignment}/remind', function ($assignmentId) {
-            // TODO: Send reminder email to reviewer
-            return back()->with('success', 'Reminder sent to reviewer.');
-        })->name('assignments.remind');
+        // TAMBAHKAN INI: Create paper route (jika diperlukan)
+        // Route::get('/create', [PaperController::class, 'create'])->name('create');
+        // Route::post('/', [PaperController::class, 'store'])->name('store');
     });
     
-    // Reviewers Management
+        // Reviewers Management
     Route::prefix('reviewers')->name('reviewers.')->group(function () {
         Route::get('/', function () {
             $reviewers = \App\Models\User::role('reviewer')->withCount([
@@ -103,19 +116,25 @@ Route::middleware(['auth', 'editor'])->prefix('editor')->name('editor.')->group(
             return view('editor.reviewers.show', compact('reviewer'));
         })->name('show');
     });
+
     
-    // Editor Tools
-    Route::prefix('tools')->name('tools.')->group(function () {
-        Route::get('/statistics', function () {
-            return view('editor.tools.statistics');
-        })->name('statistics');
+    // Reviews Management
+    Route::prefix('reviews')->name('reviews.')->group(function () {
+        Route::get('/', [ReviewController::class, 'index'])->name('index');
+        Route::get('/pending', [ReviewController::class, 'pending'])->name('pending');
+        Route::get('/completed', [ReviewController::class, 'completed'])->name('completed');
+        Route::get('/overdue', [ReviewController::class, 'overdue'])->name('overdue');
+        Route::get('/{review}', [ReviewController::class, 'show'])->name('show');
         
-        Route::get('/reports', function () {
-            return view('editor.tools.reports');
-        })->name('reports');
-        
-        Route::get('/email-templates', function () {
-            return view('editor.tools.email-templates');
-        })->name('email-templates');
+        // Review Assignment Management
+        Route::post('/assignments/{assignment}/remind', function ($assignmentId) {
+            // TODO: Implement reminder email
+            $assignment = \App\Models\ReviewAssignment::findOrFail($assignmentId);
+            // Send reminder email logic here
+            
+            return response()->json(['success' => true, 'message' => 'Reminder sent']);
+        })->name('assignments.remind');
     });
+
+    
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Editor;
 use App\Http\Controllers\Controller;
 use App\Models\Paper;
 use App\Models\User;
+use App\Models\Issue;
 use App\Models\ReviewAssignment;
 use Illuminate\Http\Request;
 
@@ -116,7 +117,21 @@ class PaperController extends Controller
      */
     public function assignReviewers(Paper $paper)
     {
-        $reviewers = User::role('reviewer')->get();
+        // Get all reviewers
+        $reviewers = User::role('reviewer')
+            ->withCount([
+                'reviewAssignments as pending_assignments' => function($query) {
+                    $query->where('status', 'pending');
+                },
+                'reviewAssignments as completed_assignments' => function($query) {
+                    $query->where('status', 'completed');
+                }
+            ])
+            ->with(['reviewAssignments' => function($query) {
+                $query->where('status', 'pending')->limit(3);
+            }])
+            ->get();
+        
         $assignedReviewers = $paper->reviewers;
         
         return view('editor.papers.assign-reviewers', compact('paper', 'reviewers', 'assignedReviewers'));
@@ -194,18 +209,48 @@ class PaperController extends Controller
      */
     public function assignIssue(Request $request, Paper $paper)
     {
-        $validated = $request->validate([
+        $request->validate([
             'issue_id' => 'required|exists:issues,id',
             'page_from' => 'nullable|integer|min:1',
             'page_to' => 'nullable|integer|gt:page_from',
         ]);
+
+        $paper->update([
+            'issue_id' => $request->issue_id,
+            'page_from' => $request->page_from,
+            'page_to' => $request->page_to,
+        ]);
+
+        return back()->with('success', 'Paper assigned to issue successfully.');
+    }
+
+    public function updateStatus(Request $request, Paper $paper)
+    {
+        $request->validate([
+            'status' => 'required|in:submitted,under_review,accepted,revision_minor,revision_major,rejected,published',
+        ]);
+
+        $oldStatus = $paper->status;
+        $paper->status = $request->status;
         
-        $paper->issue_id = $validated['issue_id'];
-        $paper->page_from = $validated['page_from'] ?? null;
-        $paper->page_to = $validated['page_to'] ?? null;
+        // Update timestamps based on status change
+        if ($request->status === 'under_review' && $oldStatus !== 'under_review') {
+            $paper->reviewed_at = now();
+        }
+        
+        if ($request->status === 'published' && $oldStatus !== 'published') {
+            $paper->published_at = now();
+        }
+        
         $paper->save();
         
-        return back()->with('success', 'Paper assigned to issue successfully.');
+        return back()->with('success', 'Paper status updated successfully.');
+    }
+
+    public function assignIssueForm(Paper $paper)
+    {
+        $issues = \App\Models\Issue::published()->orWhere('status', 'draft')->get();
+        return view('editor.papers.assign-issue', compact('paper', 'issues'));
     }
 
    

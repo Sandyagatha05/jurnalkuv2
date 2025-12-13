@@ -214,4 +214,40 @@ class AssignmentController extends Controller
         
         return app('App\Http\Controllers\PaperController')->download($paper);
     }
+
+    /**
+ * Save review as draft.
+ */
+    public function saveDraft(Request $request, ReviewAssignment $assignment)
+    {
+        if ($assignment->reviewer_id !== Auth::id()) {
+            abort(403, 'You are not assigned to this review.');
+        }
+        
+        if ($assignment->status === 'completed') {
+            return back()->with('error', 'Review already completed.');
+        }
+        
+        $validated = $request->validate([
+            'comments_to_editor' => 'nullable|string',
+            'comments_to_author' => 'nullable|string',
+            'recommendation' => 'nullable|in:accept,minor_revision,major_revision,reject',
+            'originality_score' => 'nullable|integer|min:1|max:5',
+            'contribution_score' => 'nullable|integer|min:1|max:5',
+            'clarity_score' => 'nullable|integer|min:1|max:5',
+            'methodology_score' => 'nullable|integer|min:1|max:5',
+            'overall_score' => 'nullable|integer|min:1|max:5',
+            'is_confidential' => 'boolean',
+        ]);
+        
+        // Create or update draft review
+        $review = $assignment->review ?? new Review();
+        $review->fill($validated);
+        $review->assignment_id = $assignment->id;
+        $review->save();
+        
+        // Don't update assignment status for draft
+        
+        return back()->with('success', 'Review draft saved successfully.');
+    }
 }
