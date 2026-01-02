@@ -13,19 +13,19 @@
 <div class="row">
     <!-- Stats Cards -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary h-100">
+        <div class="card border-left-warning h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h6 class="text-muted mb-1">Pending Reviews</h6>
-                        <h4 class="mb-0">{{ auth()->user()->reviewAssignments()->where('status', 'pending')->count() }}</h4>
+                        <h6 class="text-muted mb-1">Review Guidelines</h6>
+                        <h4 class="mb-0">Guides</h4>
                     </div>
-                    <div class="icon-circle bg-primary">
-                        <i class="fas fa-clock text-white"></i>
+                    <div class="icon-circle bg-warning">
+                        <i class="fas fa-book text-white"></i>
                     </div>
                 </div>
-                <a href="{{ route('reviewer.assignments.pending') }}" class="small text-primary text-decoration-none">
-                    View pending <i class="fas fa-arrow-right ms-1"></i>
+                <a href="{{ route('reviewer.guidelines') }}" class="small text-warning text-decoration-none">
+                    Read guidelines <i class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
         </div>
@@ -255,31 +255,12 @@
     
     <!-- Sidebar -->
     <div class="col-lg-4 mb-4">
-        <!-- Quick Actions -->
+        <!-- Statistics -->
         <div class="card mb-4">
             <div class="card-header">
-                <h6 class="mb-0"><i class="fas fa-bolt me-2"></i> Quick Actions</h6>
+                <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i> Your Review Statistics</h6>
             </div>
             <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{{ route('reviewer.assignments.pending') }}" class="btn btn-warning">
-                        <i class="fas fa-tasks me-2"></i> View Pending Assignments
-                    </a>
-                    <a href="{{ route('reviewer.assignments.overdue') }}" class="btn btn-danger">
-                        <i class="fas fa-exclamation-circle me-2"></i> Check Overdue Reviews
-                    </a>
-                    <a href="{{ route('reviewer.assignments.completed') }}" class="btn btn-success">
-                        <i class="fas fa-check-circle me-2"></i> View Completed Reviews
-                    </a>
-                    <a href="{{ route('reviewer.guidelines') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-book me-2"></i> Review Guidelines
-                    </a>
-                </div>
-                
-                <hr>
-                
-                <!-- Statistics -->
-                <h6 class="mb-3">Your Review Statistics</h6>
                 <div class="row text-center">
                     <div class="col-6 mb-3">
                         <div class="bg-light rounded p-3">

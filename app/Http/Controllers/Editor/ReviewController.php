@@ -66,7 +66,9 @@ class ReviewController extends Controller
     public function show(Review $review)
     {
         $review->load(['assignment.paper.author', 'assignment.reviewer']);
-        
-        return view('editor.reviews.show', compact('review'));
+        $assignment = $review->assignment;
+        $paper = $assignment->paper;
+
+        return view('editor.reviews.show', compact('review', 'assignment', 'paper'));
     }
 }

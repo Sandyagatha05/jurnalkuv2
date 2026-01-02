@@ -72,24 +72,20 @@
                     <p>{{ $paper->abstract }}</p>
                 </div>
 
-                <!-- PDF Preview (Placeholder) -->
+                <!-- PDF Embed Preview -->
                 <div class="mb-4">
                     <h6 class="border-bottom pb-2 mb-3">Paper Preview</h6>
                     <div class="card border">
-                        <div class="card-body text-center py-5">
-                            <i class="fas fa-file-pdf fa-4x text-danger mb-4"></i>
-                            <h5>{{ $paper->original_filename }}</h5>
-                            <p class="text-muted mb-4">PDF Document - {{ round(strlen($paper->file_path)/1024) }} KB</p>
-                            <div class="d-flex justify-content-center gap-3">
-                                <a href="{{ route('reviewer.assignments.download-paper', $assignment) }}" 
-                                   class="btn btn-danger">
-                                    <i class="fas fa-download me-2"></i> Download PDF
-                                </a>
-                                <a href="{{ route('reviewer.assignments.review', $assignment) }}" 
-                                   class="btn btn-primary">
-                                    <i class="fas fa-edit me-2"></i> Start Review
-                                </a>
-                            </div>
+                        <div class="card-body p-0">
+                            <embed src="{{ route('reviewer.assignments.view-paper-file', $assignment) }}#toolbar=0&navpanes=0" type="application/pdf" width="100%" height="600px">
+                        </div>
+                        <div class="card-footer d-flex justify-content-center gap-3">
+                            <a href="{{ route('reviewer.assignments.download-paper', $assignment) }}" class="btn btn-danger">
+                                <i class="fas fa-download me-2"></i> Download PDF
+                            </a>
+                            <a href="{{ route('reviewer.assignments.review', $assignment) }}" class="btn btn-primary">
+                                <i class="fas fa-edit me-2"></i> Start Review
+                            </a>
                         </div>
                     </div>
                 </div>

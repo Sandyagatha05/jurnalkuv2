@@ -187,4 +187,78 @@ class User extends Authenticatable
             'published' => $this->papers()->where('status', 'published')->count(),
         ];
     }
+
+        // Tambahkan di class User setelah relationships:
+
+    /**
+     * Get user's profile completion percentage.
+     */
+    public function getProfileCompletionAttribute()
+    {
+        $fields = [
+            'name' => !empty($this->name),
+            'email' => !empty($this->email),
+            'institution' => !empty($this->institution),
+            'department' => !empty($this->department),
+            'biography' => !empty($this->biography),
+            'orcid_id' => !empty($this->orcid_id),
+        ];
+        
+        $completed = count(array_filter($fields));
+        $total = count($fields);
+        
+        return round(($completed / $total) * 100);
+    }
+
+    /**
+     * Get user's profile photo URL.
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->photo) {
+            return asset('storage/' . $this->photo);
+        }
+        
+        // Generate initials avatar
+        $name = urlencode($this->name);
+        $bgColor = substr(md5($this->email), 0, 6);
+        return "https://ui-avatars.com/api/?name={$name}&background={$bgColor}&color=fff&size=200";
+    }
+
+    /**
+     * Get user's display name with title.
+     */
+    public function getDisplayNameAttribute()
+    {
+        $title = '';
+        
+        if ($this->hasRole('admin')) {
+            $title = 'Admin';
+        } elseif ($this->hasRole('editor')) {
+            $title = 'Editor';
+        } elseif ($this->hasRole('reviewer')) {
+            $title = 'Reviewer';
+        } elseif ($this->hasRole('author')) {
+            $title = 'Author';
+        }
+        
+        return $title ? "{$this->name} ({$title})" : $this->name;
+    }
+
+    /**
+     * Get user's recent activity.
+     */
+    public function getRecentActivity($limit = 10)
+    {
+        // You can implement activity logs here
+        return collect([]);
+    }
+
+    /**
+     * Check if user profile is complete.
+     */
+    public function isProfileComplete()
+    {
+        return $this->profile_completion >= 80;
+    }
 }

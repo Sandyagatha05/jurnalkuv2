@@ -33,6 +33,8 @@ Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->
         
         // View Paper
         Route::get('/{assignment}/paper', [AssignmentController::class, 'viewPaper'])->name('view-paper');
+        // Authenticated embed/download route for PDF (inline view)
+        Route::get('/{assignment}/paper/embed', [AssignmentController::class, 'viewPaperFile'])->name('view-paper-file');
         
         // Download Paper
         Route::get('/{assignment}/download', [AssignmentController::class, 'downloadPaper'])->name('download-paper');
@@ -45,6 +47,8 @@ Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->
     });
     
     // My Reviews
+    // My Reviews
+    // My Reviews
     Route::get('/reviews', function () {
         $reviews = \App\Models\Review::whereHas('assignment', function($query) {
             $query->where('reviewer_id', auth()->id());
@@ -52,10 +56,13 @@ Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->
         
         return view('reviewer.reviews.index', compact('reviews'));
     })->name('reviews.index');
-    
-    Route::get('/reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');
-    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
-    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+
+    // TAMBAHKAN INI - Individual review routes
+    Route::prefix('reviews')->name('reviews.')->group(function () {
+        Route::get('/{review}', [\App\Http\Controllers\ReviewController::class, 'show'])->name('show');
+        Route::get('/{review}/edit', [\App\Http\Controllers\ReviewController::class, 'edit'])->name('edit');
+        Route::put('/{review}', [\App\Http\Controllers\ReviewController::class, 'update'])->name('update');
+    });
     
     // Reviewer Profile
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -106,4 +113,11 @@ Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->
     Route::get('/conflict-of-interest', function () {
         return view('reviewer.conflict-of-interest');
     })->name('conflict-of-interest');
+
+        // Di dalam group reviewer
+    Route::prefix('reviews')->name('reviews.')->group(function () {
+        Route::get('/{review}', [ReviewController::class, 'show'])->name('show');
+        Route::get('/{review}/edit', [ReviewController::class, 'edit'])->name('edit');
+        Route::put('/{review}', [ReviewController::class, 'update'])->name('update');
+    });
 });

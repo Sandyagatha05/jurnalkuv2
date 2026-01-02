@@ -56,9 +56,12 @@ Route::middleware('auth')->group(function () {
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
     
     // User Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // User Profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
+    Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.delete-photo');
     
     // Logout
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

@@ -202,6 +202,21 @@ class AssignmentController extends Controller
     }
 
     /**
+     * Stream the paper PDF inline (for embedding) with authorization.
+     */
+    public function viewPaperFile(ReviewAssignment $assignment)
+    {
+        if ($assignment->reviewer_id !== Auth::id()) {
+            abort(403, 'You are not assigned to this review.');
+        }
+
+        $paper = $assignment->paper;
+
+        // Delegate to PaperController inline viewer
+        return app('\App\Http\Controllers\PaperController')->viewInline($paper);
+    }
+
+    /**
      * Download paper file.
      */
     public function downloadPaper(ReviewAssignment $assignment)

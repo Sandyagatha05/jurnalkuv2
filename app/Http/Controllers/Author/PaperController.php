@@ -254,6 +254,9 @@ class PaperController extends Controller
     /**
      * View reviews for paper.
      */
+/**
+ * View reviews for paper.
+ */
     public function reviews(Paper $paper)
     {
         // Authorization

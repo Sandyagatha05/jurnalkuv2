@@ -28,9 +28,6 @@
                 @endauth
             </div>
         </div>
-        <div class="col-lg-6">
-            <img src="https://via.placeholder.com/600x400" alt="Journal Management" class="img-fluid rounded shadow">
-        </div>
     </div>
 
     <!-- Features -->

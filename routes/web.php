@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReviewController;
 
 
 
@@ -21,4 +22,9 @@ Route::fallback(function () {
     return view('errors.404');
 });
 
-
+// Di luar role groups
+Route::middleware('auth')->prefix('reviews')->name('reviews.')->group(function () {
+    Route::get('/{review}', [ReviewController::class, 'show'])->name('show');
+    Route::get('/{review}/edit', [ReviewController::class, 'edit'])->name('edit');
+    Route::put('/{review}', [ReviewController::class, 'update'])->name('update');
+});

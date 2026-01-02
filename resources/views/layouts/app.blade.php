@@ -204,9 +204,7 @@
                             <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                                 <i class="fas fa-users nav-icon"></i> Users
                             </a>
-                            <a href="{{ route('admin.roles.index') }}" class="{{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                                <i class="fas fa-user-tag nav-icon"></i> Roles
-                            </a>
+                            <!-- Roles link removed per admin panel update -->
                         @endif
                         
                         <!-- Editor Menu -->

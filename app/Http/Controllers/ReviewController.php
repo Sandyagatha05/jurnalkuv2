@@ -115,16 +115,21 @@ class ReviewController extends Controller
         }
         
         $review->load(['assignment.paper', 'assignment.reviewer']);
-        
-        return view('reviews.show', compact('review'));
+        $assignment = $review->assignment;
+        $paper = $assignment->paper;
+
+        return view('reviews.show', compact('review', 'assignment', 'paper'));
     }
 
     /**
      * Show the form for editing a review.
      */
+/**
+ * Show the form for editing a review.
+ */
     public function edit(Review $review)
     {
-        // Authorization: Only the original reviewer can edit (before deadline?)
+        // Authorization: Only the original reviewer can edit
         if ($review->assignment->reviewer_id !== Auth::id()) {
             abort(403, 'You can only edit your own reviews.');
         }
@@ -178,4 +183,7 @@ class ReviewController extends Controller
         return redirect()->route('reviews.show', $review)
             ->with('success', 'Review updated successfully.');
     }
+
+    
+    
 }

@@ -166,6 +166,38 @@ class PaperController extends Controller
     }
 
     /**
+     * Stream the paper file inline so it can be embedded in an iframe/embed.
+     */
+    public function viewInline(Paper $paper)
+    {
+        // Authorization same as download/show
+        if (!$paper->isPublished()) {
+            if (!Auth::check()) {
+                abort(404);
+            }
+
+            $user = Auth::user();
+            $isAuthor = $paper->author_id === $user->id;
+            $isEditor = $user->hasRole('editor') || $user->hasRole('admin');
+            $isReviewer = $paper->reviewers()->where('reviewer_id', $user->id)->exists();
+
+            if (!$isAuthor && !$isEditor && !$isReviewer) {
+                abort(403, 'You do not have permission to view this paper.');
+            }
+        }
+
+        if (!Storage::disk('public')->exists($paper->file_path)) {
+            abort(404, 'File not found.');
+        }
+
+        // Get full path on disk and return inline file response
+        $fullPath = Storage::disk('public')->path($paper->file_path);
+        return response()->file($fullPath, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
+    /**
      * Update paper status (editor/admin only).
      */
     public function updateStatus(Request $request, Paper $paper)
