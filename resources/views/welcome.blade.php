@@ -5,6 +5,31 @@
 
 @section('content')
 
+<style>
+.btn-lift {
+    display: inline-block;
+    text-decoration: none !important;
+    transition: 
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        color 0.25s ease;
+    will-change: transform, box-shadow;
+}
+
+.btn-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+    text-decoration: none;
+}
+
+.btn-lift:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+</style>
+
+
 @php
     $issues = App\Models\Issue::with('editorial')
         ->withCount('papers') // hanya ini yang dibutuhkan
@@ -59,33 +84,69 @@
                     <!-- CTAs -->
                     <div class="d-flex flex-wrap gap-3 mb-4">
                         @auth
-                            <a href="{{ route('dashboard') }}" class="px-4 py-2 fw-semibold rounded"
-                                style="background-color: #FFD166; color: #193366; text-decoration: none; font-size: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                                <i class="fas fa-tachometer-alt me-2"></i> Go to Dashboard
+                            <a href="{{ route('dashboard') }}"
+                               class="btn-lift px-4 py-2 fw-semibold rounded"
+                               style="background-color: #FFD166; color: #193366;">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Go to Dashboard
                             </a>
                         @else
-                            <a href="{{ route('register') }}" class="px-4 py-2 fw-semibold rounded"
-                                style="background-color: #FFD166; color: #193366; text-decoration: none; font-size: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                                <i class="fas fa-user-plus me-2"></i> Get Started
+                            <a href="{{ route('register') }}"
+                               class="btn-lift px-4 py-2 fw-semibold rounded"
+                               style="background-color: #FFD166; color: #193366;">
+                                <i class="fas fa-user-plus me-2"></i>
+                                Get Started
                             </a>
-                            <a href="{{ route('login') }}" class="px-4 py-2 fw-semibold rounded"
-                                style="background-color: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; text-decoration: none; font-size: 1rem;">
-                                <i class="fas fa-sign-in-alt me-2"></i> Login
+
+                            <a href="{{ route('login') }}"
+                               class="btn-lift px-4 py-2 fw-semibold rounded"
+                               style="background-color: transparent; border: 1px solid rgba(255,255,255,0.5); color: white;">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Login
                             </a>
                         @endauth
                     </div>
 
                     <!-- Stats -->
                     <div class="d-flex gap-4">
-                        @foreach([['val' => '500+', 'label' => 'Published Articles'],
-                                ['val' => '120+', 'label' => 'Active Authors'],
-                                ['val' => '7', 'label' => 'Published Volumes']] as $stat)
+                        @foreach([
+                            ['val' => 500, 'label' => 'Published Articles'],
+                            ['val' => 120, 'label' => 'Active Authors'],
+                            ['val' => 7,   'label' => 'Published Volumes']
+                        ] as $stat)
                             <div class="text-center">
-                                <div class="fs-3 fw-bold" style="color: #FFD166;">{{ $stat['val'] }}</div>
-                                <div class="text-white" style="font-size: 0.875rem; opacity: 0.9;">{{ $stat['label'] }}</div>
+                                <div class="fs-3 fw-bold stat-number"
+                                    style="color: #FFD166;"
+                                    data-target="{{ $stat['val'] }}">
+                                    0
+                                </div>
+                                <div class="text-white" style="font-size: 0.875rem; opacity: 0.9;">
+                                    {{ $stat['label'] }}
+                                </div>
                             </div>
                         @endforeach
                     </div>
+
+                    <script>
+                    document.querySelectorAll('.stat-number').forEach(counter => {
+                        const target = Number(counter.dataset.target);
+                        const duration = 700; // ms (cepat)
+                        const start = performance.now();
+
+                        function animate(time) {
+                            const progress = Math.min((time - start) / duration, 1);
+                            counter.textContent = Math.floor(progress * target) + '+';
+
+                            if (progress < 1) {
+                                requestAnimationFrame(animate);
+                            } else {
+                                counter.textContent = target + '+';
+                            }
+                        }
+
+                        requestAnimationFrame(animate);
+                    });
+                    </script>
                 </div>
             </div>
         </div>
@@ -119,7 +180,9 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">Latest Issues</h2>
             @if($issues->count() > 0)
-                <a href="{{ route('issues.index') }}" class="px-3 py-1 rounded" style="background-color: var(--primary-color); color: white; text-decoration: none; font-size: 0.875rem;">
+                <a href="{{ route('issues.index') }}"
+                   class="btn-lift px-3 py-1 rounded"
+                   style="background-color: var(--primary-color); color: white; font-size: 0.9rem;">
                     View All Issues
                 </a>
             @endif
@@ -192,11 +255,12 @@
                                 @endif
 
                                 <div class="text-center mt-3">
-                                    <a href="{{ route('issues.show', $issue) }}" class="px-4 py-2 rounded fw-medium"
-                                    style="background-color: var(--primary-color); color: white; text-decoration: none; font-size: 0.875rem; display: inline-block;">
-                                        View All Articles
-                                        <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i>
-                                    </a>
+                                    <a href="{{ route('issues.show', $issue) }}"
+                                   class="btn-lift d-inline-block mt-3 px-4 py-2 rounded fw-medium"
+                                   style="background-color: var(--primary-color); color: white; font-size: 0.85rem;">
+                                    View All Articles
+                                    <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
                                 </div>
                             </div>
                         </div>
