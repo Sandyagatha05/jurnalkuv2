@@ -32,7 +32,7 @@ class IssueController extends Controller
             $query->where('title', 'like', '%' . request('search') . '%');
         }
         
-        $issues = $query->paginate(12);
+        $issues = $query->paginate(9);
         
         // Get available years and volumes for filter
         $years = Issue::published()->distinct()->pluck('year')->sortDesc()->toArray();

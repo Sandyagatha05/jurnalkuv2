@@ -16,27 +16,31 @@ class PaperController extends Controller
 /**
  * Display a listing of papers (public).
  */
-    public function index()
+    public function index(Request $request)
     {
-        $query = Paper::with('author', 'issue')
+        $query = Paper::with(['author', 'issue'])
             ->published()
             ->orderBy('published_at', 'desc');
-        
-        // Jika ada filter search
-        if (request()->has('search')) {
-            $search = request('search');
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                ->orWhere('abstract', 'like', "%{$search}%")
-                ->orWhere('keywords', 'like', "%{$search}%")
-                ->orWhereHas('author', function($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                });
+
+        if ($request->filled('search')) {
+            $keywords = preg_split('/\s+/', trim($request->search));
+
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $q->where(function ($qq) use ($word) {
+                        $qq->where('title', 'LIKE', "%{$word}%")
+                        ->orWhere('abstract', 'LIKE', "%{$word}%")
+                        ->orWhere('keywords', 'LIKE', "%{$word}%")
+                        ->orWhereHas('author', function ($qa) use ($word) {
+                            $qa->where('name', 'LIKE', "%{$word}%");
+                        });
+                    });
+                }
             });
         }
-        
-        $papers = $query->paginate(15);
-        
+
+        $papers = $query->paginate(9)->withQueryString();
+
         return view('papers.index', compact('papers'));
     }
 

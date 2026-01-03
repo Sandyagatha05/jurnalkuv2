@@ -4,246 +4,324 @@
 @section('description', 'Browse all published journal issues')
 
 @section('content')
-<div class="container py-5">
-    <!-- Header dengan Search -->
-    <div class="row mb-5">
-        <div class="col-lg-8">
-            <h1 class="display-5 fw-bold mb-3">Journal Issues</h1>
-            <p class="lead">
-                Browse through our collection of published journal issues. 
-                Each issue contains carefully selected research papers and editorial content.
-            </p>
-        </div>
-        <div class="col-lg-4 text-lg-end">
-            <form method="GET" action="{{ route('issues.index') }}" class="d-flex">
-                <!-- Keep existing filters -->
-                @if(request()->has('year'))
-                    <input type="hidden" name="year" value="{{ request('year') }}">
-                @endif
-                @if(request()->has('volume'))
-                    <input type="hidden" name="volume" value="{{ request('volume') }}">
-                @endif
-                <input type="text" name="search" class="form-control me-2" 
-                       placeholder="Search issues..." value="{{ request('search') }}">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-        </div>
-    </div>
 
-    <!-- Filter Options -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body py-3">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <select name="year" class="form-select" id="yearFilter">
-                                <option value="">All Years</option>
-                                @if(isset($years) && count($years) > 0)
-                                    @foreach($years as $year)
-                                        <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>
-                                            {{ $year }}
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select name="volume" class="form-select" id="volumeFilter">
-                                <option value="">All Volumes</option>
-                                @if(isset($volumes) && count($volumes) > 0)
-                                    @foreach($volumes as $volume)
-                                        <option value="{{ $volume }}" {{ request('volume') == $volume ? 'selected' : '' }}>
-                                            Volume {{ $volume }}
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
-                        </div>
-                        <div class="col-md-6 text-md-end">
-                            <div class="d-flex gap-2 justify-content-end">
-                                <button type="button" class="btn btn-outline-secondary" onclick="resetFilters()">
-                                    <i class="fas fa-sync me-2"></i> Reset Filters
-                                </button>
-                                <a href="{{ route('archive') }}" class="btn btn-outline-primary">
-                                    <i class="fas fa-archive me-2"></i> View Archive
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+<style>
+.btn-lift {
+    display: inline-block;
+    text-decoration: none !important;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        color 0.25s ease;
+    will-change: transform, box-shadow;
+}
+
+.btn-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+}
+
+.btn-lift:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.filter-select {
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .15s ease;
+}
+
+.filter-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 .15rem rgba(25,51,102,.15);
+}
+
+.filter-select:hover {
+    transform: translateY(-1px);
+}
+
+.pagination .page-link {
+    border-radius:.5rem;
+    border:1px solid var(--border);
+    color:var(--foreground);
+    padding:.5rem .75rem;
+    background:white;
+}
+.pagination .page-item.active .page-link {
+    background:var(--primary-color);
+    color:white;
+    border-color:var(--primary-color);
+}
+.pagination .page-item.disabled .page-link {
+    opacity:.4;
+    pointer-events:none;
+}
+</style>
+
+<div class="journal-container py-5">
+
+    <!-- HERO HEADER -->
+    <section class="position-relative mb-5" style="border-radius: 1rem; overflow: hidden;">
+        <div class="position-absolute top-0 start-0 w-100 h-100"
+             style="background: linear-gradient(135deg, #193366 0%, #253d6c 45%, #193366 100%);">
+        </div>
+
+        <div class="position-relative p-5 text-white">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3"
+                          style="background: rgba(255,209,102,.15); border:1px solid rgba(255,209,102,.3);">
+                        <i class="fas fa-book-open fa-xs" style="color:#FFD166"></i>
+                        <span style="color:#FFD166;font-size:.85rem">Published Issues</span>
+                    </span>
+
+                    <h1 class="fw-bold mb-2" style="font-size:2.25rem;">
+                        Journal Issues
+                    </h1>
+                    <p class="mb-0" style="opacity:.9; max-width:40rem;">
+                        Browse officially published journal volumes containing peer-reviewed research
+                        and editorial insights.
+                    </p>
+                </div>
+
+                <!-- SEARCH -->
+                <div class="col-lg-4 mt-4 mt-lg-0">
+                    <form method="GET" action="{{ route('issues.index') }}" class="d-flex gap-2">
+                        @foreach(['year','volume'] as $f)
+                            @if(request()->has($f))
+                                <input type="hidden" name="{{ $f }}" value="{{ request($f) }}">
+                            @endif
+                        @endforeach
+                        <input type="text"
+                               name="search"
+                               value="{{ request('search') }}"
+                               class="form-control"
+                               placeholder="Search issue title…">
+                        <button class="btn btn-lift"
+                                style="background:#FFD166;color:#193366;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- FILTER BAR -->
+    <div class="mb-5 p-4 rounded"
+        style="
+            background: var(--muted);
+            border:1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        ">
+
+        <div class="row g-3 align-items-center">
+
+            <!-- YEAR FILTER -->
+            <div class="col-md-3">
+                <label class="fw-medium mb-1 d-block"
+                    style="font-size:.8rem; color:var(--foreground); opacity:.7;">
+                    Year
+                </label>
+                <select id="yearFilter"
+                        class="form-select filter-select">
+                    <option value="">All Years</option>
+                    @foreach($years ?? [] as $year)
+                        <option value="{{ $year }}" @selected(request('year')==$year)>
+                            {{ $year }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- VOLUME FILTER -->
+            <div class="col-md-3">
+                <label class="fw-medium mb-1 d-block"
+                    style="font-size:.8rem; color:var(--foreground); opacity:.7;">
+                    Volume
+                </label>
+                <select id="volumeFilter"
+                        class="form-select filter-select">
+                    <option value="">All Volumes</option>
+                    @foreach($volumes ?? [] as $vol)
+                        <option value="{{ $vol }}" @selected(request('volume')==$vol)>
+                            Volume {{ $vol }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="col-md-6 text-md-end">
+                <div class="d-flex gap-2 justify-content-md-end align-items-end h-100">
+
+                    <!-- RESET -->
+                    <button onclick="resetFilters()"
+                            class="btn btn-lift btn-sm"
+                            style="
+                                background: white;
+                                border:1px solid var(--border);
+                                color:var(--foreground);
+                            ">
+                        <i class="fas fa-sync me-1"></i>
+                        Reset
+                    </button>
+
+                    <!-- ARCHIVE -->
+                    <a href="{{ route('archive') }}"
+                    class="btn btn-lift btn-sm"
+                    style="
+                            background: var(--primary-color);
+                            color: white;
+                    ">
+                        <i class="fas fa-archive me-1"></i>
+                        Archive
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Issues Grid -->
-    @if($issues->count() > 0)
-        <div class="row">
+    <!-- ISSUES GRID -->
+    @php
+        $issues = \App\Models\Issue::with('editorial','papers')
+            ->orderBy('year','desc')
+            ->orderBy('volume','desc')
+            ->orderBy('number','desc')
+            ->paginate(9);
+    @endphp
+
+    @if($issues->count())
+        <div class="row g-4">
             @foreach($issues as $issue)
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 issue-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <span class="badge bg-primary">Vol. {{ $issue->volume }}, No. {{ $issue->number }}</span>
-                                    <span class="badge bg-secondary">{{ $issue->year }}</span>
-                                </div>
-                                <small class="text-muted">
-                                    {{ $issue->published_date->format('M d, Y') }}
-                                </small>
+                <div class="col-md-6 col-lg-4">
+                    <div class="h-100 rounded issue-card"
+                         style="border:1px solid var(--border); background:white;">
+    
+                        <!-- HEADER -->
+                        <div class="p-4" style="background:var(--primary-color); color:white; border-radius:.75rem .75rem 0 0;">
+                            <div class="d-flex justify-content-between mb-2" style="font-size:.75rem; opacity:.85;">
+                                <span>Vol {{ $issue->volume }}, No {{ $issue->number }}</span>
+                                <span>{{ $issue->year }}</span>
                             </div>
-                            
-                            <h5 class="card-title mb-3">
-                                <a href="{{ route('issues.show', $issue) }}" class="text-decoration-none text-dark">
-                                    {{ $issue->title }}
-                                </a>
-                            </h5>
-                            
-                            <p class="card-text text-muted mb-4">
+
+                            <h3 class="fw-bold mb-1" style="font-size:1.15rem;">
+                                {{ $issue->title }}
+                            </h3>
+
+                            <small style="opacity:.75;">
+                                Published: {{ $issue->published_date->format('M d, Y') }}
+                            </small>
+
+                            <div class="d-flex gap-3 mt-2" style="font-size:.75rem; opacity:.75;">
+                                <span><i class="fas fa-file-alt me-1"></i>{{ $issue->papers->count() }} papers</span>
+                            </div>
+                        </div>
+
+                        <!-- BODY -->
+                        <div class="p-4">
+                            <p class="mb-3" style="font-size:.9rem; opacity:.75;">
                                 {{ Str::limit($issue->description, 120) }}
                             </p>
-                            
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fas fa-file-alt text-primary me-1"></i>
-                                    <small class="text-muted">
-                                        {{ $issue->papers->count() }} papers
-                                    </small>
+
+                            @if($issue->editorial && $issue->editorial->is_published)
+                                <div class="mb-3 p-3 rounded" style="background:var(--muted); font-size:.85rem;">
+                                    <i class="fas fa-edit me-1 text-secondary"></i>
+                                    <strong>Editorial:</strong> "{{ Str::limit($issue->editorial->title, 40) }}"
                                 </div>
-                                <a href="{{ route('issues.show', $issue) }}" class="btn btn-sm btn-outline-primary">
+                            @endif
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted" style="font-size:.8rem;">
+                                    <i class="fas fa-book me-1"></i>{{ $issue->papers->count() }} Articles
+                                </span>
+
+                                <a href="{{ route('issues.show', $issue) }}"
+                                   class="btn-lift px-3 py-2 rounded"
+                                   style="background:var(--primary-color); color:white; font-size:.8rem;">
                                     View Issue <i class="fas fa-arrow-right ms-1"></i>
                                 </a>
                             </div>
                         </div>
-                        
-                        @if($issue->editorial && $issue->editorial->is_published)
-                            <div class="card-footer bg-transparent border-top">
-                                <small class="text-muted">
-                                    <i class="fas fa-edit me-1"></i>
-                                    Editorial: "{{ Str::limit($issue->editorial->title, 40) }}"
-                                </small>
-                            </div>
-                        @endif
                     </div>
                 </div>
             @endforeach
         </div>
 
-        <!-- Pagination -->
+        <!-- PAGINATION -->
+
+        <!-- PAGINATION ISSUES -->
+        @if ($issues->hasPages())
         <div class="d-flex justify-content-center mt-5">
-            {{ $issues->links() }}
+            <nav>
+                <ul class="pagination gap-2">
+
+                    {{-- Previous --}}
+                    <li class="page-item {{ $issues->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link btn-lift" href="{{ $issues->previousPageUrl() ?? '#' }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    {{-- Page Numbers --}}
+                    @foreach ($issues->getUrlRange(1, $issues->lastPage()) as $page => $url)
+                        @php
+                            // Keep search/year/volume query
+                            $url = request()->has('search') ? $url . '&search=' . request('search') : $url;
+                            $url = request()->has('year') ? $url . '&year=' . request('year') : $url;
+                            $url = request()->has('volume') ? $url . '&volume=' . request('volume') : $url;
+                        @endphp
+                        <li class="page-item {{ $page == $issues->currentPage() ? 'active' : '' }}">
+                            <a class="page-link btn-lift" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endforeach
+
+                    {{-- Next --}}
+                    <li class="page-item {{ $issues->hasMorePages() ? '' : 'disabled' }}">
+                        <a class="page-link btn-lift" href="{{ $issues->nextPageUrl() ?? '#' }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
         </div>
+        @endif
+
     @else
+        <!-- EMPTY STATE -->
         <div class="text-center py-5">
-            <i class="fas fa-book-open fa-4x text-muted mb-4"></i>
-            <h4 class="text-muted mb-3">No Issues Found</h4>
+            <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
+            <h4 class="fw-semibold">No Issues Found</h4>
             <p class="text-muted mb-4">
-                @if(request()->hasAny(['search', 'year', 'volume']))
-                    Try adjusting your search filters
-                @else
-                    No issues have been published yet.
-                @endif
+                No published issues match your current filters.
             </p>
-            <button class="btn btn-primary" onclick="resetFilters()">
-                <i class="fas fa-sync me-2"></i> Clear Filters
+            <button onclick="resetFilters()" class="btn btn-primary btn-sm">
+                Clear Filters
             </button>
         </div>
     @endif
 </div>
 
-<style>
-    .issue-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-        border: 1px solid #e9ecef;
-    }
-    
-    .issue-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        border-color: #4361ee;
-    }
-    
-    .issue-card .card-title {
-        min-height: 60px;
-    }
-</style>
 @endsection
 
 @push('scripts')
 <script>
-    // Filter by year
-    document.getElementById('yearFilter').addEventListener('change', function() {
-        applyFilter('year', this.value);
-    });
-    
-    // Filter by volume
-    document.getElementById('volumeFilter').addEventListener('change', function() {
-        applyFilter('volume', this.value);
-    });
-    
-    // Function to apply filter
-    function applyFilter(field, value) {
-        const url = new URL(window.location.href);
-        
-        // Reset to page 1 when filtering
-        if (url.searchParams.has('page')) {
-            url.searchParams.delete('page');
-        }
-        
-        if (value) {
-            url.searchParams.set(field, value);
-        } else {
-            url.searchParams.delete(field);
-        }
-        
-        // Keep search term if exists
-        const searchTerm = "{{ request('search') }}";
-        if (searchTerm) {
-            url.searchParams.set('search', searchTerm);
-        }
-        
-        window.location.href = url.toString();
-    }
-    
-    // Reset all filters
-    function resetFilters() {
-        window.location.href = "{{ route('issues.index') }}";
-    }
-    
-    // Show active filters info
-    document.addEventListener('DOMContentLoaded', function() {
-        const yearFilter = document.getElementById('yearFilter');
-        const volumeFilter = document.getElementById('volumeFilter');
-        const searchValue = "{{ request('search') }}";
-        
-        // Add visual indicator for active filters
-        if (yearFilter.value) {
-            yearFilter.classList.add('border-primary', 'border-2');
-        }
-        if (volumeFilter.value) {
-            volumeFilter.classList.add('border-primary', 'border-2');
-        }
-        
-        // Show active filters count
-        let activeFilters = 0;
-        if (yearFilter.value) activeFilters++;
-        if (volumeFilter.value) activeFilters++;
-        if (searchValue) activeFilters++;
-        
-        if (activeFilters > 0) {
-            const filterInfo = document.createElement('div');
-            filterInfo.className = 'alert alert-info mt-3';
-            filterInfo.innerHTML = `
-                <i class="fas fa-filter me-2"></i>
-                <strong>${activeFilters} filter(s) active</strong>
-                <button class="btn btn-sm btn-outline-info ms-3" onclick="resetFilters()">
-                    Clear all
-                </button>
-            `;
-            document.querySelector('.card-body.py-3').appendChild(filterInfo);
-        }
-    });
+function applyFilter(key, val) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('page');
+    val ? url.searchParams.set(key,val) : url.searchParams.delete(key);
+    window.location.href = url.toString();
+}
+document.getElementById('yearFilter')?.addEventListener('change',e=>applyFilter('year',e.target.value));
+document.getElementById('volumeFilter')?.addEventListener('change',e=>applyFilter('volume',e.target.value));
+function resetFilters() {
+    window.location.href = "{{ route('issues.index') }}";
+}
 </script>
 @endpush

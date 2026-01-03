@@ -4,281 +4,320 @@
 @section('description', Str::limit($issue->description, 160))
 
 @section('content')
-<div class="container py-5">
-    <!-- Issue Header -->
-    <div class="row mb-5">
-        <div class="col-lg-8">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('issues.index') }}">Issues</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        Vol. {{ $issue->volume }}, No. {{ $issue->number }}
-                    </li>
-                </ol>
-            </nav>
-            
-            <div class="d-flex align-items-center mb-3">
-                <span class="badge bg-primary fs-6 me-3">Vol. {{ $issue->volume }}, No. {{ $issue->number }}</span>
-                <span class="badge bg-secondary fs-6">{{ $issue->year }}</span>
-            </div>
-            
-            <h1 class="display-5 fw-bold mb-3">{{ $issue->title }}</h1>
-            
-            <div class="d-flex align-items-center text-muted mb-4">
-                <i class="far fa-calendar me-2"></i>
-                <span>Published: {{ $issue->published_date->format('F d, Y') }}</span>
-                <span class="mx-3">•</span>
-                <i class="fas fa-user-edit me-2"></i>
-                <span>Editor: {{ $issue->editor->name ?? 'Not assigned' }}</span>
-            </div>
-            
-            <p class="lead">{{ $issue->description }}</p>
+
+<!-- ================= HERO ================= -->
+<section class="issue-hero">
+    <div class="container">
+        <nav class="breadcrumb breadcrumb-dark mb-3">
+            <a href="{{ route('home') }}">Home</a>
+            <span>/</span>
+            <a href="{{ route('issues.index') }}">Archives</a>
+            <span>/</span>
+            <span>Vol. {{ $issue->volume }} No. {{ $issue->number }}</span>
+        </nav>
+
+        <div class="issue-hero-meta">
+            <i class="fas fa-book-open"></i>
+            <span>{{ $issue->title }}</span>
         </div>
-        
-        <div class="col-lg-4">
-            <div class="card border-primary">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-primary">Issue Details</h5>
-                    <div class="display-1 fw-bold text-primary mb-3">
-                        {{ $issue->volume }}.{{ $issue->number }}
-                    </div>
-                    <p class="card-text">
-                        <strong>{{ $issue->year }}</strong><br>
-                        {{ $issue->published_date->format('F Y') }}
-                    </p>
-                    <hr>
-                    <p class="mb-2">
-                        <i class="fas fa-file-alt me-2"></i>
-                        {{ $issue->papers->count() }} Research Papers
-                    </p>
-                    <p class="mb-0">
-                        <i class="fas fa-download me-2"></i>
-                        <a href="#" class="text-decoration-none">Download Full Issue (PDF)</a>
-                    </p>
-                </div>
-            </div>
+
+        <h1 class="issue-hero-title">
+            Volume {{ $issue->volume }}, No. {{ $issue->number }} ({{ $issue->year }})
+        </h1>
+
+        <div class="issue-hero-info">
+            <span>
+                <i class="far fa-calendar"></i>
+                {{ $issue->published_date->format('F Y') }}
+            </span>
+            <span>
+                <i class="fas fa-file-alt"></i>
+                {{ $issue->papers->count() }} articles
+            </span>
         </div>
     </div>
+</section>
 
-    <!-- Editorial -->
-    @if($issue->editorial && $issue->editorial->is_published)
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card border-warning">
-                    <div class="card-header bg-warning bg-opacity-10">
-                        <h3 class="card-title mb-0">
-                            <i class="fas fa-edit me-2"></i> Editorial
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <h4 class="mb-3">{{ $issue->editorial->title }}</h4>
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="me-3">
-                                <i class="fas fa-user-circle fa-2x text-muted"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0">{{ $issue->editorial->author->name }}</h6>
-                                <small class="text-muted">{{ $issue->editorial->author->institution }}</small>
-                            </div>
-                        </div>
-                        <div class="editorial-content">
-                            {!! nl2br(e($issue->editorial->content)) !!}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
+<!-- ================= CONTENT ================= -->
+<section class="container journal-section">
+    <div class="journal-wrapper">
 
-    <!-- Papers -->
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">
-                    <i class="fas fa-file-alt me-2"></i> Research Papers
-                    <span class="badge bg-primary fs-6 ms-2">{{ $issue->papers->count() }}</span>
-                </h2>
-                
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-primary active" data-filter="all">
-                        All Papers
-                    </button>
-                    @foreach($categories as $category)
-                        <button type="button" class="btn btn-outline-primary" data-filter="{{ Str::slug($category) }}">
-                            {{ $category }}
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-            
-            @if($issue->papers->count() > 0)
-                <div class="row" id="papers-container">
-                    @foreach($issue->papers as $paper)
-                        <div class="col-lg-6 mb-4 paper-item" data-categories="{{ Str::slug($paper->category ?? 'uncategorized') }}">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div>
-                                            <span class="badge bg-info">Paper {{ $loop->iteration }}</span>
-                                            @if($paper->page_from && $paper->page_to)
-                                                <span class="badge bg-secondary ms-2">
-                                                    Pages {{ $paper->page_from }}-{{ $paper->page_to }}
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <small class="text-muted">
-                                            {{ $paper->created_at->format('M d, Y') }}
-                                        </small>
-                                    </div>
-                                    
-                                    <h5 class="card-title mb-3">
-                                        <a href="{{ route('papers.show', $paper) }}" class="text-decoration-none text-dark">
-                                            {{ $paper->title }}
-                                        </a>
-                                    </h5>
-                                    
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3">
-                                            <i class="fas fa-user-circle text-muted"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">{{ $paper->author->name }}</h6>
-                                            <small class="text-muted">{{ $paper->author->institution }}</small>
-                                        </div>
-                                    </div>
-                                    
-                                    <p class="card-text text-muted mb-4">
-                                        {{ Str::limit($paper->abstract, 150) }}
-                                    </p>
-                                    
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            @if($paper->doi)
-                                                <small class="text-muted">
-                                                    DOI: <code>{{ $paper->doi }}</code>
-                                                </small>
-                                            @endif
-                                        </div>
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('papers.show', $paper) }}" class="btn btn-outline-primary">
-                                                <i class="fas fa-eye me-1"></i> View
-                                            </a>
-                                            <a href="{{ route('papers.download', $paper) }}" class="btn btn-outline-danger">
-                                                <i class="fas fa-download me-1"></i> PDF
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                @if($paper->keywords)
-                                    <div class="card-footer bg-transparent border-top">
-                                        <small class="text-muted">
-                                            <i class="fas fa-tags me-1"></i>
-                                            {{ $paper->keywords }}
-                                        </small>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                
-                <!-- Download All -->
-                <div class="text-center mt-5">
-                    <div class="card border-dashed">
-                        <div class="card-body py-4">
-                            <i class="fas fa-download fa-3x text-primary mb-3"></i>
-                            <h4 class="mb-3">Download Complete Issue</h4>
-                            <p class="text-muted mb-4">
-                                Get all papers from this issue in a single PDF file
-                            </p>
-                            <button class="btn btn-primary btn-lg">
-                                <i class="fas fa-file-pdf me-2"></i> Download Full Issue (PDF)
-                            </button>
-                        </div>
+        <!-- ================= EDITORIAL ================= -->
+        @if($issue->editorial && $issue->editorial->is_published)
+            <section class="mb-5 fade-in">
+                <span class="section-label">Editorial</span>
+
+                <div class="editorial-box">
+                    <h2 class="journal-title">
+                        {{ $issue->editorial->title }}
+                    </h2>
+                    <p class="journal-meta">
+                        by {{ $issue->editorial->author->name }}
+                        — {{ $issue->editorial->author->institution }}
+                    </p>
+
+                    <div class="journal-text">
+                        {!! nl2br(e($issue->editorial->content)) !!}
                     </div>
                 </div>
-            @else
-                <div class="text-center py-5">
-                    <i class="fas fa-file-alt fa-4x text-muted mb-4"></i>
-                    <h4 class="text-muted mb-3">No Papers Published</h4>
-                    <p class="text-muted">This issue does not contain any papers yet.</p>
-                </div>
-            @endif
+            </section>
+        @endif
+
+        <!-- ================= ARTICLES HEADER ================= -->
+        <div class="articles-header">
+            <h2>Articles</h2>
+            <div class="articles-line"></div>
+            <span class="articles-count">
+                {{ $issue->papers->count() }} articles
+            </span>
         </div>
-    </div>
-    
-    <!-- Navigation -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <nav aria-label="Issue navigation">
-                <ul class="pagination justify-content-center">
-                    @if($previousIssue)
-                        <li class="page-item">
-                            <a class="page-link" href="{{ route('issues.show', $previousIssue) }}">
-                                <i class="fas fa-arrow-left me-2"></i> Previous Issue
-                            </a>
-                        </li>
+
+        <!-- ================= ARTICLES ================= -->
+        <div class="article-list">
+            @foreach($issue->papers as $index => $paper)
+                <article class="journal-card slide-up"
+                         style="animation-delay: {{ $index * 100 }}ms">
+
+                    <a href="{{ route('papers.show', $paper) }}"
+                       class="article-title">
+                        {{ $paper->title }}
+                    </a>
+
+                    <div class="article-authors">
+                        <i class="fas fa-user author-icon"></i>
+                        {{ $paper->author->name }}
+                        <span>({{ $paper->author->institution }})</span>
+                    </div>
+
+                    <p class="article-abstract">
+                        {{ Str::limit($paper->abstract, 280) }}
+                    </p>
+
+                    @if($paper->keywords)
+                        <div class="article-keywords">
+                            @foreach(explode(',', $paper->keywords) as $kw)
+                                <span class="keyword-badge">
+                                    {{ trim($kw) }}
+                                </span>
+                            @endforeach
+                        </div>
                     @endif
-                    
-                    <li class="page-item">
-                        <a class="page-link" href="{{ route('issues.index') }}">
-                            <i class="fas fa-list me-2"></i> All Issues
-                        </a>
-                    </li>
-                    
-                    @if($nextIssue)
-                        <li class="page-item">
-                            <a class="page-link" href="{{ route('issues.show', $nextIssue) }}">
-                                Next Issue <i class="fas fa-arrow-right ms-2"></i>
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </nav>
-        </div>
-    </div>
-</div>
 
+                    <div class="article-footer">
+                        <div class="article-meta">
+                            @if($paper->doi)
+                                <span>DOI: {{ $paper->doi }}</span>
+                            @endif
+                            @if($paper->page_from && $paper->page_to)
+                                <span>Pages {{ $paper->page_from }}–{{ $paper->page_to }}</span>
+                            @endif
+                        </div>
+
+                        <div class="article-actions">
+                            <a href="{{ route('papers.show', $paper) }}"
+                               class="btn btn-primary-soft btn-lift">
+                                Read
+                            </a>
+                            <a href="{{ route('papers.download', $paper) }}"
+                               class="btn btn-secondary-soft btn-lift">
+                                <i class="fas fa-download me-1"></i> PDF
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+
+        <!-- ================= BACK ================= -->
+        <div class="text-center mt-5">
+            <a href="{{ route('issues.index') }}"
+               class="btn btn-outline-secondary btn-lift">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Archives
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= STYLES ================= -->
 <style>
-    .border-dashed {
-        border: 2px dashed #dee2e6;
-        background-color: #f8f9fa;
-    }
-    
-    .editorial-content {
-        line-height: 1.8;
-    }
-    
-    .editorial-content p {
-        margin-bottom: 1rem;
-    }
-</style>
+/* HERO */
 
-@push('scripts')
-<script>
-    // Filter papers by category
-    document.querySelectorAll('[data-filter]').forEach(button => {
-        button.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
-            
-            // Update active button
-            document.querySelectorAll('[data-filter]').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            this.classList.add('active');
-            
-            // Filter papers
-            document.querySelectorAll('.paper-item').forEach(item => {
-                if (filter === 'all' || item.getAttribute('data-categories') === filter) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    });
-</script>
-@endpush
+.section-label {
+    display:inline-block;
+    font-size:.75rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    background:rgba(0,0,0,.05);
+    padding:.3rem .8rem;
+    border-radius:999px;
+    margin-bottom:1rem;
+}
+
+.issue-hero {
+    background: var(--primary-color);
+    color: #fff;
+    padding: 4rem 0;
+}
+.breadcrumb-dark a {
+    color: rgba(255,255,255,.7);
+    text-decoration:none;
+}
+.breadcrumb-dark span { margin: 0 .4rem; opacity:.6; }
+
+.issue-hero-meta {
+    display:flex;
+    gap:.5rem;
+    color:var(--secondary-color);
+    font-size:.9rem;
+    margin-bottom:.5rem;
+}
+.issue-hero-title {
+    font-weight:700;
+    font-size:2.2rem;
+}
+.issue-hero-info {
+    margin-top:1rem;
+    display:flex;
+    gap:1.5rem;
+    opacity:.85;
+}
+
+/* LAYOUT */
+.journal-section { padding:4rem 0; }
+.journal-wrapper { max-width:900px; margin:auto; }
+
+/* EDITORIAL */
+.editorial-box {
+    background: hsl(var(--journal-cream) / .5);
+    border: 1px solid #1932631f;
+    background-color: #c4a86111;
+    border-radius: 18px;
+    padding: 2rem;
+}
+
+/* ARTICLES HEADER */
+.articles-header {
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    margin:3rem 0 2rem;
+}
+.articles-header h2 {
+    margin:0;
+    font-weight:600;
+}
+.articles-line {
+    flex:1;
+    height:1px;
+    background:#ddd;
+}
+.articles-count {
+    font-size:0.9rem;
+    color:#666;
+    white-space:nowrap;
+}
+
+/* CARDS */
+.journal-card {
+    background:#fff;
+    border-radius:14px;
+    padding:1.75rem;
+    box-shadow:0 10px 25px rgba(0,0,0,.05);
+    margin-bottom:1.75rem;
+}
+
+.journal-title { font-size:1.25rem; font-weight:600; }
+
+/* ARTICLE */
+.article-title {
+    font-size:1.2rem;
+    font-weight:600;
+    color:#111;
+    text-decoration:none;
+}
+.article-title:hover {
+    color:var(--primary-color);
+}
+
+.author-icon {
+    margin-right: 5px;
+}
+
+.article-authors {
+    font-size:.85rem;
+    color:#666;
+    margin-top:.5rem;
+}
+.article-abstract {
+    margin-top:1rem;
+    line-height:1.7;
+    color:#444;
+}
+
+.article-keywords {
+    margin-top:1rem;
+    display:flex;
+    gap:.4rem;
+    flex-wrap:wrap;
+}
+.keyword-badge {
+    font-size:.8rem;
+    background:#eee;
+    padding:.25rem .6rem;
+    border-radius:999px;
+}
+
+.article-footer {
+    margin-top:1.5rem;
+    padding-top:1rem;
+    border-top:1px solid #eee;
+    display:flex;
+    justify-content:space-between;
+    gap:1rem;
+    flex-wrap:wrap;
+}
+
+.article-meta { font-size:.85rem; color:#666; }
+
+/* BUTTONS (HOME STYLE) */
+.btn-primary-soft {
+    background: var(--primary-color);
+    color:#fff;
+}
+.btn-secondary-soft {
+    background:#f1f3f5;
+    color:#333;
+}
+.btn-primary-soft:hover,
+.btn-secondary-soft:hover {
+    filter:brightness(.95);
+}
+
+/* ANIMATION */
+.btn-lift {
+    transition: all .2s ease;
+}
+.btn-lift:hover {
+    transform: translateY(-2px);
+    box-shadow:0 6px 15px rgba(0,0,0,.12);
+}
+
+.fade-in {
+    animation:fade .5s ease both;
+}
+.slide-up {
+    animation:slide .5s ease both;
+}
+
+@keyframes fade {
+    from { opacity:0; }
+    to { opacity:1; }
+}
+@keyframes slide {
+    from { opacity:0; transform:translateY(12px); }
+    to { opacity:1; transform:none; }
+}
+</style>
 @endsection

@@ -51,8 +51,8 @@
             position: sticky;
             top: 0;
             z-index: 1020;
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--border);
         }
 
@@ -60,7 +60,7 @@
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             text-decoration: none;
             display: inline-block;
 
@@ -163,8 +163,8 @@
                         <i class="fas fa-book-open fa-sm"></i>
                     </div>
                     <div>
-                        <div class="fw-bold" style="font-size: 1.25rem; color: var(--primary-color);">Jurnalku</div>
-                        <div class="text-muted" style="font-size: 0.75rem; color: var(--foreground);">Academic Journal</div>
+                        <div class="fw-bold" style="font-size: 1.25rem; line-height: 1.2; color: var(--primary-color);">Jurnalku</div>
+                        <div class="text-muted" style="font-size: 0.9rem; line-height: 1.2; color: var(--foreground);">Academic Journal</div>
                     </div>
                 </a>
 
