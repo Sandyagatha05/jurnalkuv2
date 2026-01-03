@@ -309,13 +309,9 @@
             <div class="mt-5 pt-4 border-top" style="border-color: rgba(255, 255, 255, 0.2);">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                     <p class="text-white-50 mb-0" style="font-size: 0.875rem;">
-                        &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
+                        &copy; {{ date('Y') }} Jurnalku. All rights reserved.
                     </p>
-                    <div>
-                        <a href="#" class="text-white-50 me-3"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-white-50"><i class="fab fa-linkedin"></i></a>
-                    </div>
+                    
                 </div>
             </div>
         </div>
