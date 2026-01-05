@@ -9,327 +9,303 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Styles -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Remix Icon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+
     <style>
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --success-color: #4cc9f0;
-            --warning-color: #f72585;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
+            --primary-color: #193366;
+            --secondary-color: #E8BA30;
+            --background: #f5f7fb;
+            --foreground: #1e293b;
+            --border: #e2e8f0;
         }
-        
+
         body {
             font-family: 'Figtree', sans-serif;
-            background-color: #f5f7fb;
+            background-color: var(--background);
+            color: var(--foreground);
         }
-        
-        .sidebar {
-            background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+
+        /* Layout */
+        .dashboard-wrapper {
+            display: flex;
             min-height: 100vh;
-            color: white;
         }
-        
-        .sidebar a {
-            color: #cbd5e0;
-            text-decoration: none;
-            display: block;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            transition: all 0.3s;
-        }
-        
-        .sidebar a:hover, .sidebar a.active {
-            background-color: #4a5568;
-            color: white;
-        }
-        
-        .sidebar .nav-icon {
-            width: 20px;
-            margin-right: 10px;
-            text-align: center;
-        }
-        
-        .main-content {
-            padding: 20px;
-        }
-        
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border: none;
-            margin-bottom: 20px;
-        }
-        
-        .card-header {
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
             background-color: white;
-            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 1030;
+        }
+
+        /* Sidebar Header (logo public-style) */
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+
+        .logo-subtitle {
+            font-size: 0.875rem;
+            color: var(--foreground);
+        }
+
+        /* User Info */
+        .sidebar-user {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 600;
         }
-        
+
+        .avatar-title {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        /* Navigation */
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            margin: 4px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--foreground);
+            font-size: 0.9rem;
+            transition: background-color .2s ease, color .2s ease;
+        }
+
+        .sidebar nav a i {
+            width: 18px;
+            text-align: center;
+        }
+
+        .sidebar nav a:hover {
+            background-color: #1933660d;
+            color: var(--primary-color);
+        }
+
+        .sidebar nav a.active {
+            background-color: #19336613;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Logout */
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Main */
+        .main {
+            margin-left: 260px;
+            flex: 1;
+            padding: 28px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main {
+                margin-left: 0;
+            }
+        }
+
+        .pagination .page-link {
+            border-radius: .5rem;
+            border: 1px solid var(--border);
+            color: var(--foreground);
+            padding: .5rem .75rem;
+            background: white;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            color: #fff;
         }
-        
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: #152950; /* versi lebih gelap */
+            border-color: #152950;
+            color: #fff;
         }
-        
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-submitted { background-color: #e9ecef; color: #495057; }
-        .status-under_review { background-color: #fff3cd; color: #856404; }
-        .status-accepted { background-color: #d1ecf1; color: #0c5460; }
-        .status-published { background-color: #d4edda; color: #155724; }
-        .status-rejected { background-color: #f8d7da; color: #721c24; }
-        .status-revision_minor { background-color: #fff3cd; color: #856404; }
-        .status-revision_major { background-color: #f8d7da; color: #721c24; }
-        
-        .table th {
-            border-top: none;
-            font-weight: 600;
-            color: #6c757d;
+
+        .btn-primary:active {
+            background-color: #0f1f3f;
+            border-color: #0f1f3f;
         }
     </style>
-    
+
     @stack('styles')
 </head>
 <body>
-    <!-- Top Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="fas fa-book me-2"></i> {{ config('app.name', 'Jurnalku') }}
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    @auth
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->name }}
-                                @if(Auth::user()->hasRole('admin'))
-                                    <span class="badge bg-danger">Admin</span>
-                                @elseif(Auth::user()->hasRole('editor'))
-                                    <span class="badge bg-primary">Editor</span>
-                                @elseif(Auth::user()->hasRole('reviewer'))
-                                    <span class="badge bg-warning">Reviewer</span>
-                                @elseif(Auth::user()->hasRole('author'))
-                                    <span class="badge bg-success">Author</span>
-                                @endif
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ route('dashboard') }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                    <i class="fas fa-user me-2"></i> Profile
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">Register</a>
-                        </li>
-                    @endauth
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            @auth
-            <!-- Sidebar for authenticated users -->
-            <div class="col-md-2 d-none d-md-block sidebar p-0">
-                <div class="p-3">
-                    <h5 class="text-center mb-4">
-                        <i class="fas fa-user-circle me-2"></i> {{ Auth::user()->name }}
-                    </h5>
-                    
-                    <div class="mb-4 text-center">
-                        @if(Auth::user()->hasRole('admin'))
-                            <span class="badge bg-danger">Administrator</span>
-                        @elseif(Auth::user()->hasRole('editor'))
-                            <span class="badge bg-primary">Editor</span>
-                        @elseif(Auth::user()->hasRole('reviewer'))
-                            <span class="badge bg-warning">Reviewer</span>
-                        @elseif(Auth::user()->hasRole('author'))
-                            <span class="badge bg-success">Author</span>
-                        @endif
-                    </div>
-                    
-                    <nav class="nav flex-column">
-                        <!-- Dashboard Link -->
-                        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-tachometer-alt nav-icon"></i> Dashboard
-                        </a>
-                        
-                        <!-- Admin Menu -->
-                        @if(Auth::user()->hasRole('admin'))
-                            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.*') ? 'active' : '' }}">
-                                <i class="fas fa-crown nav-icon"></i> Admin Panel
-                            </a>
-                            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                                <i class="fas fa-users nav-icon"></i> Users
-                            </a>
-                            <!-- Roles link removed per admin panel update -->
-                        @endif
-                        
-                        <!-- Editor Menu -->
-                        @if(Auth::user()->hasRole('editor'))
-                            <a href="{{ route('editor.dashboard') }}" class="{{ request()->routeIs('editor.*') ? 'active' : '' }}">
-                                <i class="fas fa-edit nav-icon"></i> Editor Panel
-                            </a>
-                            <a href="{{ route('editor.papers.index') }}" class="{{ request()->routeIs('editor.papers.*') ? 'active' : '' }}">
-                                <i class="fas fa-file-alt nav-icon"></i> Papers
-                            </a>
-                            <a href="{{ route('editor.issues.index') }}" class="{{ request()->routeIs('editor.issues.*') ? 'active' : '' }}">
-                                <i class="fas fa-book nav-icon"></i> Issues
-                            </a>
-                        @endif
-                        
-                        <!-- Reviewer Menu -->
-                        @if(Auth::user()->hasRole('reviewer'))
-                            <a href="{{ route('reviewer.dashboard') }}" class="{{ request()->routeIs('reviewer.*') ? 'active' : '' }}">
-                                <i class="fas fa-search nav-icon"></i> Reviewer Panel
-                            </a>
-                            <a href="{{ route('reviewer.assignments.pending') }}" class="{{ request()->routeIs('reviewer.assignments.*') ? 'active' : '' }}">
-                                <i class="fas fa-tasks nav-icon"></i> Assignments
-                            </a>
-                        @endif
-                        
-                        <!-- Author Menu -->
-                        @if(Auth::user()->hasRole('author'))
-                            <a href="{{ route('author.dashboard') }}" class="{{ request()->routeIs('author.*') ? 'active' : '' }}">
-                                <i class="fas fa-user-edit nav-icon"></i> Author Panel
-                            </a>
-                            <a href="{{ route('author.papers.index') }}" class="{{ request()->routeIs('author.papers.*') ? 'active' : '' }}">
-                                <i class="fas fa-file-upload nav-icon"></i> My Papers
-                            </a>
-                            <a href="{{ route('author.papers.create') }}" class="{{ request()->routeIs('author.papers.create') ? 'active' : '' }}">
-                                <i class="fas fa-plus-circle nav-icon"></i> Submit Paper
-                            </a>
-                        @endif
-                        
-                        <!-- Common Links -->
-                        <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">
-                            <i class="fas fa-user nav-icon"></i> Profile
-                        </a>
-                        
-                        <a href="{{ route('home') }}">
-                            <i class="fas fa-home nav-icon"></i> Public Site
-                        </a>
-                    </nav>
-                </div>
+<div class="dashboard-wrapper">
+
+@auth
+<aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-header">
+        <a href="{{ route('home') }}">
+            <div class="logo-box">
+                <i class="fas fa-book-open fa-sm"></i>
             </div>
-            
-            <!-- Main Content Area -->
-            <main class="col-md-10 ms-sm-auto main-content">
-        @else
-            <!-- Full width for non-authenticated users -->
-            <main class="col-12 main-content">
-        @endif
-        
-                <!-- Flash Messages -->
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-                
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-                
-                @if(session('info'))
-                    <div class="alert alert-info alert-dismissible fade show" role="alert">
-                        <i class="fas fa-info-circle me-2"></i> {{ session('info') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-                
-                <!-- Page Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h2 class="mb-1">@yield('page-title')</h2>
-                        <p class="text-muted mb-0">@yield('page-description')</p>
-                    </div>
-                    <div>
-                        @yield('page-actions')
-                    </div>
-                </div>
-                
-                <!-- Page Content -->
-                @yield('content')
-            </main>
+            <div>
+                <div class="logo-title">Jurnalku</div>
+                <div class="logo-subtitle">Academic Journal</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- User -->
+    <div class="sidebar-user d-flex align-items-center gap-3">
+        <div class="avatar">
+            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+        </div>
+        <div>
+            <div class="fw-semibold">{{ Auth::user()->name }}</div>
+            <small class="text-muted">
+                {{ ucfirst(Auth::user()->roles->first()->name ?? '') }}
+            </small>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom Scripts -->
-    <script>
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').alert('close');
-        }, 5000);
-        
-        // Confirm before delete
-        function confirmDelete(event) {
-            if (!confirm('Are you sure you want to delete this item?')) {
-                event.preventDefault();
-                return false;
-            }
-        }
-        
-        // Format date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-    </script>
-    
-    @stack('scripts')
+    <!-- Menu -->
+    <nav class="flex-grow-1 mt-2">
+        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+
+        @if(Auth::user()->hasRole('admin'))
+            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <i class="fas fa-users"></i> Users
+            </a>
+        @endif
+
+        @if(Auth::user()->hasRole('editor'))
+            <a href="{{ route('editor.papers.index') }}" class="{{ request()->routeIs('editor.papers.*') ? 'active' : '' }}">
+                <i class="fas fa-file-alt"></i> Papers
+            </a>
+        @endif
+
+        @if(Auth::user()->hasRole('author'))
+            <a href="{{ route('author.papers.create') }}" class="{{ request()->routeIs('author.papers.create') ? 'active' : '' }}">
+                <i class="fas fa-upload"></i> Submit Paper
+            </a>
+        @endif
+
+        <a href="{{ route('profile.show') }}"
+            class="{{ request()->routeIs('profile.show') || request()->routeIs('profile.edit') ? 'active' : '' }}">
+                <i class="fas fa-user"></i> Profile
+        </a>
+
+        <a href="{{ route('home') }}">
+            <i class="fas fa-globe"></i> Public Site
+        </a>
+    </nav>
+
+    <!-- Logout Bottom -->
+    <div class="sidebar-footer">
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button class="btn btn-outline-danger w-100">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </button>
+        </form>
+    </div>
+</aside>
+@endauth
+
+<main class="main">
+    @yield('content')
+</main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@stack('scripts')
 </body>
 </html>
