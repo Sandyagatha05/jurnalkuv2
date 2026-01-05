@@ -104,11 +104,16 @@
         }
 
         .footer-icon {
-            width: 1rem;
-            height: 1rem;
+            width: 1.25rem;
+            height: 1.25rem;
             color: var(--secondary-color);
             flex-shrink: 0;
-            margin-top: 0.125rem;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            line-height: 1;
         }
 
         .main-content {
@@ -290,17 +295,27 @@
                 <div class="col-6 col-md-3">
                     <h3 class="footer-heading text-white">Contact</h3>
                     <ul class="list-unstyled">
-                        <li class="d-flex gap-2 mb-3 align-items-start">
+                        <li class="d-flex gap-3 mb-3 align-items-start">
                             <i class="fas fa-map-marker-alt footer-icon"></i>
-                            <span class="text-white-75" style="font-size: 0.875rem;">Jakarta, Indonesia</span>
+                            <span class="text-white-75" style="font-size: 0.875rem;">
+                                Jakarta, Indonesia
+                            </span>
                         </li>
-                        <li class="d-flex gap-2 mb-2 align-items-center">
+
+                        <li class="d-flex gap-3 mb-3 align-items-start">
                             <i class="fas fa-envelope footer-icon"></i>
-                            <a href="mailto:contact@jurnalku.com" class="footer-link text-white-75" style="font-size: 0.875rem;">contact@jurnalku.com</a>
+                            <a href="mailto:contact@jurnalku.com"
+                            class="footer-link text-white-75"
+                            style="font-size: 0.875rem;">
+                                contact@jurnalku.com
+                            </a>
                         </li>
-                        <li class="d-flex gap-2 align-items-center">
+
+                        <li class="d-flex gap-3 align-items-start">
                             <i class="fas fa-phone footer-icon"></i>
-                            <span class="text-white-75" style="font-size: 0.875rem;">+62 123 456 789</span>
+                            <span class="text-white-75" style="font-size: 0.875rem;">
+                                +62 123 456 789
+                            </span>
                         </li>
                     </ul>
                 </div>

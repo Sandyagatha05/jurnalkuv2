@@ -27,6 +27,32 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
+
+@keyframes floatPattern {
+    0% {
+        transform: translate3d(0px, 0px, 0);
+    }
+    20% {
+        transform: translate3d(18px, -12px, 0);
+    }
+    40% {
+        transform: translate3d(-14px, -26px, 0);
+    }
+    60% {
+        transform: translate3d(-28px, 6px, 0);
+    }
+    80% {
+        transform: translate3d(10px, 22px, 0);
+    }
+    100% {
+        transform: translate3d(0px, 0px, 0);
+    }
+}
+
+.hero-pattern {
+    animation: floatPattern 10s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    will-change: transform;
+}
 </style>
 
 
@@ -52,9 +78,10 @@
         "></div>
 
         <!-- Subtle Pattern (lebih halus) -->
-        <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="
+        <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10 hero-pattern" style="
             background-image: url(&quot;data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 5c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zm50 30c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4z' fill='%23ffffff' fill-opacity='0.08'/%3E%3C/svg%3E&quot;);
         "></div>
+
 
         <!-- Konten -->
         <div class="journal-container position-relative py-5 py-md-6" style="z-index: 2;">

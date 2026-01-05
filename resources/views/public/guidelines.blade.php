@@ -4,52 +4,54 @@
 @section('description', 'Guidelines for authors submitting manuscripts to our journal')
 
 @section('content')
-<div class="container py-5">
-    <div class="row mb-5">
-        <div class="col-lg-8 mx-auto">
-            <h1 class="display-5 fw-bold mb-3">Author Guidelines</h1>
-            <p class="lead">
-                Please follow these guidelines when preparing and submitting your manuscript 
-                to ensure a smooth review and publication process.
-            </p>
-        </div>
+<div class="journal-container py-5">
+
+    <!-- PAGE HEADER -->
+    <div class="text-center mb-5">
+        <span class="badge mb-3 fs-6 px-3 py-2"
+              style="background: var(--secondary-color); color: var(--foreground);">
+            For Authors
+        </span>
+        <h1 class="fw-bold mb-3" style="font-size:2.6rem; color:var(--primary-color);">
+            Author Guidelines
+        </h1>
+        <p class="mx-auto text-muted" style="max-width:720px; font-size:1.1rem;">
+            Please follow these guidelines when preparing and submitting your manuscript 
+            to ensure a smooth review and publication process.
+        </p>
     </div>
 
-    <div class="row">
-        <div class="col-lg-3 mb-4">
-            <!-- Sidebar Navigation -->
-            <div class="sticky-top" style="top: 20px;">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h6 class="mb-0"><i class="fas fa-list me-2"></i> Contents</h6>
-                    </div>
+    <div class="row g-4">
+        <!-- SIDEBAR -->
+        <div class="col-lg-3">
+            <div class="sticky-top" style="top:100px;">
+
+                <!-- CONTENT NAV -->
+                <div class="card mb-4">
                     <div class="card-body p-0">
-                        <div class="list-group list-group-flush">
-                            <a href="#scope" class="list-group-item list-group-item-action">
-                                Scope & Focus
-                            </a>
-                            <a href="#submission" class="list-group-item list-group-item-action">
-                                Submission Process
-                            </a>
-                            <a href="#formatting" class="list-group-item list-group-item-action">
-                                Formatting Requirements
-                            </a>
-                            <a href="#ethics" class="list-group-item list-group-item-action">
-                                Publication Ethics
-                            </a>
-                            <a href="#review" class="list-group-item list-group-item-action">
-                                Review Process
-                            </a>
-                            <a href="#publication" class="list-group-item list-group-item-action">
-                                Publication Process
-                            </a>
+                        <div class="px-4 py-3 border-bottom">
+                            <h6 class="fw-semibold mb-0" style="color:var(--primary-color);">
+                                <i class="fas fa-list me-2"></i> Contents
+                            </h6>
+                        </div>
+
+                        <div class="list-group list-group-flush guideline-nav">
+                            <a href="#scope" class="list-group-item">Scope & Focus</a>
+                            <a href="#submission" class="list-group-item">Submission Process</a>
+                            <a href="#formatting" class="list-group-item">Formatting Requirements</a>
+                            <a href="#ethics" class="list-group-item">Publication Ethics</a>
+                            <a href="#review" class="list-group-item">Review Process</a>
+                            <a href="#publication" class="list-group-item">Publication Process</a>
                         </div>
                     </div>
                 </div>
-                
-                <div class="card mt-4">
+
+                <!-- CTA -->
+                <div class="card">
                     <div class="card-body text-center">
-                        <a href="{{ route('author.papers.create') }}" class="btn btn-primary w-100 mb-2">
+                        <a href="{{ route('author.papers.create') }}"
+                           class="btn btn-lift w-100 mb-2"
+                           style="background:var(--primary-color); color:white;">
                             <i class="fas fa-paper-plane me-2"></i> Submit Paper
                         </a>
                         <small class="text-muted">
@@ -60,15 +62,16 @@
             </div>
         </div>
 
+        <!-- MAIN CONTENT -->
         <div class="col-lg-9">
-            <!-- Main Content -->
             <div class="card">
-                <div class="card-body">
-                    <!-- Scope & Focus -->
-                    <section id="scope" class="mb-5">
-                        <h2 class="mb-3">Scope & Focus</h2>
+                <div class="card-body p-4 p-lg-5">
+
+                    <!-- Scope -->
+                    <section id="scope" class="content-section">
+                        <h2 class="section-title">Scope & Focus</h2>
                         <p>{{ config('app.name') }} publishes original research articles, review papers, and case studies in the following areas:</p>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <ul>
@@ -87,20 +90,20 @@
                                 </ul>
                             </div>
                         </div>
-                        
-                        <div class="alert alert-info">
+
+                        <div class="alert alert-info mt-3">
                             <i class="fas fa-info-circle me-2"></i>
                             We welcome interdisciplinary research that bridges multiple fields of study.
                         </div>
                     </section>
 
-                    <!-- Submission Process -->
-                    <section id="submission" class="mb-5">
-                        <h2 class="mb-3">Submission Process</h2>
-                        
+                    <!-- Submission -->
+                    <section id="submission" class="content-section">
+                        <h2 class="section-title">Submission Process</h2>
+
                         <h5>1. Prepare Your Manuscript</h5>
                         <p>Ensure your manuscript follows our formatting guidelines before submission.</p>
-                        
+
                         <h5>2. Online Submission</h5>
                         <p>Submit through our online system:</p>
                         <ol>
@@ -111,7 +114,7 @@
                             <li>Complete submission checklist</li>
                             <li>Submit for review</li>
                         </ol>
-                        
+
                         <h5>3. Required Documents</h5>
                         <ul>
                             <li>Manuscript in PDF format</li>
@@ -121,12 +124,12 @@
                         </ul>
                     </section>
 
-                    <!-- Formatting Requirements -->
-                    <section id="formatting" class="mb-5">
-                        <h2 class="mb-3">Formatting Requirements</h2>
-                        
+                    <!-- Formatting -->
+                    <section id="formatting" class="content-section">
+                        <h2 class="section-title">Formatting Requirements</h2>
+
                         <div class="table-responsive">
-                            <table class="table table-bordered">
+                            <table class="table table-bordered align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Element</th>
@@ -134,154 +137,78 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Language</td>
-                                        <td>English (British or American)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>File Format</td>
-                                        <td>PDF only</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Page Size</td>
-                                        <td>A4 (210 × 297 mm)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Margins</td>
-                                        <td>2.5 cm on all sides</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Font</td>
-                                        <td>Times New Roman, 12 pt</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Line Spacing</td>
-                                        <td>1.5 lines</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Maximum Length</td>
-                                        <td>8000 words (including references)</td>
-                                    </tr>
+                                    <tr><td>Language</td><td>English (British or American)</td></tr>
+                                    <tr><td>File Format</td><td>PDF only</td></tr>
+                                    <tr><td>Page Size</td><td>A4 (210 × 297 mm)</td></tr>
+                                    <tr><td>Margins</td><td>2.5 cm on all sides</td></tr>
+                                    <tr><td>Font</td><td>Times New Roman, 12 pt</td></tr>
+                                    <tr><td>Line Spacing</td><td>1.5 lines</td></tr>
+                                    <tr><td>Maximum Length</td><td>8000 words (including references)</td></tr>
                                 </tbody>
                             </table>
                         </div>
-                        
-                        <h5 class="mt-4">Manuscript Structure</h5>
-                        <p>Papers should generally include the following sections:</p>
-                        <ol>
-                            <li>Title (concise and informative)</li>
-                            <li>Abstract (200-300 words)</li>
-                            <li>Keywords (4-6 terms)</li>
-                            <li>Introduction</li>
-                            <li>Literature Review</li>
-                            <li>Methodology</li>
-                            <li>Results</li>
-                            <li>Discussion</li>
-                            <li>Conclusion</li>
-                            <li>References</li>
-                            <li>Appendices (if needed)</li>
-                        </ol>
                     </section>
 
-                    <!-- Publication Ethics -->
-                    <section id="ethics" class="mb-5">
-                        <h2 class="mb-3">Publication Ethics</h2>
-                        
+                    <!-- Ethics -->
+                    <section id="ethics" class="content-section">
+                        <h2 class="section-title">Publication Ethics</h2>
+
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             All authors must adhere to our publication ethics policy.
                         </div>
-                        
-                        <h5>Author Responsibilities</h5>
-                        <ul>
-                            <li>Original work: Manuscript must be original and not published elsewhere</li>
-                            <li>Authorship: All authors must have contributed significantly</li>
-                            <li>Disclosure: Conflicts of interest must be declared</li>
-                            <li>Data integrity: Data must be accurate and reproducible</li>
-                            <li>Copyright: Authors retain copyright but grant publishing rights</li>
-                        </ul>
-                        
-                        <h5>Plagiarism Policy</h5>
-                        <p>We use plagiarism detection software. Manuscripts with significant plagiarism will be rejected.</p>
                     </section>
 
-                    <!-- Review Process -->
-                    <section id="review" class="mb-5">
-                        <h2 class="mb-3">Review Process</h2>
-                        
-                        <p>We follow a double-blind peer review process:</p>
-                        
-                        <div class="row g-4 mb-4">
+                    <!-- Review -->
+                    <section id="review" class="content-section">
+                        <h2 class="section-title">Review Process</h2>
+
+                        <div class="row g-4 my-4">
                             <div class="col-md-4">
-                                <div class="card border-primary h-100">
-                                    <div class="card-body text-center">
-                                        <div class="display-6 text-primary mb-3">1-3 days</div>
-                                        <h6>Initial Screening</h6>
-                                        <small class="text-muted">Editor checks for completeness and scope</small>
-                                    </div>
+                                <div class="review-card border-primary">
+                                    <div class="review-time text-primary">1–3 days</div>
+                                    <h6>Initial Screening</h6>
+                                    <small>Editor checks for completeness and scope</small>
                                 </div>
                             </div>
-                            
                             <div class="col-md-4">
-                                <div class="card border-warning h-100">
-                                    <div class="card-body text-center">
-                                        <div class="display-6 text-warning mb-3">2-4 weeks</div>
-                                        <h6>Peer Review</h6>
-                                        <small class="text-muted">Review by 2-3 experts in the field</small>
-                                    </div>
+                                <div class="review-card border-warning">
+                                    <div class="review-time text-warning">2–4 weeks</div>
+                                    <h6>Peer Review</h6>
+                                    <small>Review by 2–3 experts</small>
                                 </div>
                             </div>
-                            
                             <div class="col-md-4">
-                                <div class="card border-success h-100">
-                                    <div class="card-body text-center">
-                                        <div class="display-6 text-success mb-3">1-2 weeks</div>
-                                        <h6>Decision</h6>
-                                        <small class="text-muted">Editor makes final decision</small>
-                                    </div>
+                                <div class="review-card border-success">
+                                    <div class="review-time text-success">1–2 weeks</div>
+                                    <h6>Decision</h6>
+                                    <small>Final editorial decision</small>
                                 </div>
                             </div>
                         </div>
-                        
-                        <h5>Possible Decisions</h5>
-                        <ul>
-                            <li><strong>Accept:</strong> Paper accepted as is</li>
-                            <li><strong>Minor Revision:</strong> Accept after minor changes</li>
-                            <li><strong>Major Revision:</strong> Re-review after major changes</li>
-                            <li><strong>Reject:</strong> Paper not suitable for publication</li>
-                        </ul>
                     </section>
 
-                    <!-- Publication Process -->
-                    <section id="publication">
-                        <h2 class="mb-3">Publication Process</h2>
-                        
-                        <h5>After Acceptance</h5>
-                        <ol>
-                            <li>Submit final manuscript with revisions</li>
-                            <li>Sign copyright agreement</li>
-                            <li>Pay publication fees (if applicable)</li>
-                            <li>Receive proofs for final check</li>
-                            <li>Paper assigned to an issue</li>
-                            <li>Published online with DOI</li>
-                        </ol>
-                        
-                        <h5>Open Access Policy</h5>
-                        <p>{{ config('app.name') }} is an open access journal. All published articles are freely available to read, download, and share.</p>
-                        
+                    <!-- Publication -->
+                    <section id="publication" class="content-section mb-0">
+                        <h2 class="section-title">Publication Process</h2>
+
                         <div class="alert alert-success">
-                            <h6><i class="fas fa-question-circle me-2"></i> Need Help?</h6>
+                            <h6 class="mb-1">
+                                <i class="fas fa-question-circle me-2"></i> Need Help?
+                            </h6>
                             <p class="mb-0">
-                                Contact our editorial office at 
-                                <a href="mailto:editorial@jurnalku.com" class="text-decoration-none">editorial@jurnalku.com</a>
-                                for any questions about the submission process.
+                                Contact our editorial office at
+                                <a href="mailto:editorial@jurnalku.com">editorial@jurnalku.com</a>
                             </p>
                         </div>
                     </section>
+
                 </div>
-                
+
                 <div class="card-footer text-center">
-                    <a href="{{ route('author.papers.create') }}" class="btn btn-primary btn-lg">
+                    <a href="{{ route('author.papers.create') }}"
+                       class="btn btn-lift btn-lg"
+                       style="background:var(--primary-color); color:white;">
                         <i class="fas fa-paper-plane me-2"></i> Begin Submission
                     </a>
                 </div>
@@ -291,67 +218,45 @@
 </div>
 
 <style>
-    section {
-        scroll-margin-top: 20px;
-    }
-    
-    .list-group-item.active {
-        background-color: #4361ee;
-        border-color: #4361ee;
-    }
-    
-    .sticky-top {
-        z-index: 1020;
-    }
-</style>
+.content-section {
+    margin-bottom: 4rem;
+}
 
-@push('scripts')
-<script>
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                window.scrollTo({
-                    top: targetElement.offsetTop - 80,
-                    behavior: 'smooth'
-                });
-                
-                // Update active nav item
-                document.querySelectorAll('.list-group-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                this.classList.add('active');
-            }
-        });
-    });
-    
-    // Update active nav based on scroll position
-    window.addEventListener('scroll', function() {
-        const sections = document.querySelectorAll('section');
-        const navItems = document.querySelectorAll('.list-group-item');
-        
-        let currentSection = '';
-        
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop - 100;
-            if (window.pageYOffset >= sectionTop) {
-                currentSection = '#' + section.getAttribute('id');
-            }
-        });
-        
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('href') === currentSection) {
-                item.classList.add('active');
-            }
-        });
-    });
-</script>
-@endpush
+.section-title {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1.2rem;
+}
+
+.guideline-nav .list-group-item {
+    border: none;
+    padding: .75rem 1.25rem;
+    transition: all .2s ease;
+}
+
+.guideline-nav .list-group-item:hover,
+.guideline-nav .list-group-item.active {
+    background: #19336613;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.review-card {
+    border:1px solid var(--border);
+    border-radius: .75rem;
+    padding: 1.5rem;
+    text-align:center;
+    height:100%;
+}
+
+.review-time {
+    font-size:1.5rem;
+    font-weight:700;
+    margin-bottom:.5rem;
+}
+
+section {
+    scroll-margin-top: 120px;
+}
+</style>
 @endsection
