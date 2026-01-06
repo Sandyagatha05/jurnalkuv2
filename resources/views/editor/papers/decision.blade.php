@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('page-title', 'Make Editorial Decision')
+@section('page-title', 'Editorial Decision')
 @section('page-description', 'Final decision for paper: ' . $paper->title)
 
 @section('page-actions')
@@ -11,116 +11,124 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-gavel me-2"></i> Make Editorial Decision
-                    <span class="badge bg-light text-dark">{{ $paper->reviewAssignments->where('status', 'completed')->count() }}/{{ $paper->reviewAssignments->count() }} reviews complete</span>
-                </h5>
+    <div class="col-xl-9 col-lg-10">
+
+        {{-- ===================== MAIN CARD ===================== --}}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-gavel me-2 text-success"></i>
+                        Make Editorial Decision
+                    </h5>
+                    <span class="badge bg-success-subtle text-success">
+                        {{ $paper->reviewAssignments->where('status', 'completed')->count() }}
+                        /
+                        {{ $paper->reviewAssignments->count() }} Reviews Completed
+                    </span>
+                </div>
             </div>
+
             <div class="card-body">
-                <!-- Paper Info -->
-                <div class="alert alert-light border mb-4">
-                    <div class="d-flex">
-                        <div class="me-3">
-                            <i class="fas fa-file-alt fa-2x text-primary"></i>
+
+                {{-- ===================== PAPER INFO ===================== --}}
+                <div class="border rounded p-3 mb-4 bg-light">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="icon-shape bg-primary text-white rounded-circle">
+                            <i class="fas fa-file-alt"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="alert-heading mb-1">{{ $paper->title }}</h6>
-                            <p class="mb-1"><strong>Author:</strong> {{ $paper->author->name }}</p>
-                            <p class="mb-0"><strong>Abstract:</strong> {{ Str::limit($paper->abstract, 150) }}</p>
+                            <h6 class="fw-semibold mb-1">{{ $paper->title }}</h6>
+                            <div class="text-muted small mb-2">
+                                <strong>Author:</strong> {{ $paper->author->name }}
+                            </div>
+                            <p class="mb-0 text-muted small">
+                                <strong>Abstract:</strong> {{ Str::limit($paper->abstract, 160) }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Review Summary -->
-                <div class="mb-4">
-                    <h6 class="border-bottom pb-2 mb-3">Review Summary</h6>
-                    
-                    <div class="row mb-4">
-                        @php
-                            $recommendations = $paper->reviewAssignments
-                                ->where('status', 'completed')
-                                ->map(function($assignment) {
-                                    return $assignment->review->recommendation ?? null;
-                                })
-                                ->filter()
-                                ->values();
-                            
-                            $recommendationCounts = [
-                                'accept' => 0,
-                                'minor_revision' => 0,
-                                'major_revision' => 0,
-                                'reject' => 0,
-                            ];
-                            
-                            foreach ($recommendations as $rec) {
-                                if (isset($recommendationCounts[$rec])) {
-                                    $recommendationCounts[$rec]++;
-                                }
+                {{-- ===================== REVIEW SUMMARY ===================== --}}
+                <div class="mb-5">
+                    <h6 class="fw-semibold border-bottom pb-2 mb-3">
+                        Review Summary
+                    </h6>
+
+                    @php
+                        $recommendations = $paper->reviewAssignments
+                            ->where('status', 'completed')
+                            ->map(fn($a) => $a->review->recommendation ?? null)
+                            ->filter();
+
+                        $recommendationCounts = [
+                            'accept' => 0,
+                            'minor_revision' => 0,
+                            'major_revision' => 0,
+                            'reject' => 0,
+                        ];
+
+                        foreach ($recommendations as $rec) {
+                            if (isset($recommendationCounts[$rec])) {
+                                $recommendationCounts[$rec]++;
                             }
-                        @endphp
-                        
+                        }
+                    @endphp
+
+                    <div class="row g-3 mb-4">
                         @foreach($recommendationCounts as $rec => $count)
                             @if($count > 0)
-                                <div class="col-md-3 mb-3">
-                                    <div class="card text-center">
-                                        <div class="card-body py-3">
-                                            <div class="display-6 fw-bold text-{{ 
-                                                $rec == 'accept' ? 'success' : 
-                                                ($rec == 'reject' ? 'danger' : 'warning') 
-                                            }} mb-2">{{ $count }}</div>
-                                            <h6 class="mb-0 text-{{ 
-                                                $rec == 'accept' ? 'success' : 
-                                                ($rec == 'reject' ? 'danger' : 'warning') 
-                                            }}">
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="card h-100 text-center border-0 shadow-sm">
+                                        <div class="card-body py-4">
+                                            <div class="fs-1 fw-bold 
+                                                text-{{ $rec === 'accept' ? 'success' : ($rec === 'reject' ? 'danger' : 'warning') }}">
+                                                {{ $count }}
+                                            </div>
+                                            <div class="text-muted small">
                                                 {{ ucfirst(str_replace('_', ' ', $rec)) }}
-                                            </h6>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             @endif
                         @endforeach
                     </div>
-                    
-                    <!-- Reviewer Comments -->
+
+                    {{-- ===================== REVIEWER COMMENTS ===================== --}}
                     @if($paper->reviewAssignments->where('status', 'completed')->count() > 0)
-                        <h6 class="mb-3">Reviewer Comments</h6>
-                        <div class="row">
+                        <h6 class="fw-semibold mb-3">Reviewer Comments</h6>
+                        <div class="row g-3">
                             @foreach($paper->reviewAssignments->where('status', 'completed') as $assignment)
                                 @if($assignment->review)
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card border h-100">
+                                    <div class="col-lg-6">
+                                        <div class="card h-100 border shadow-sm">
                                             <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
                                                     <div>
-                                                        <h6 class="mb-1">{{ $assignment->reviewer->name }}</h6>
-                                                        <small class="text-muted">{{ $assignment->reviewer->institution }}</small>
+                                                        <h6 class="mb-0">{{ $assignment->reviewer->name }}</h6>
+                                                        <small class="text-muted">
+                                                            {{ $assignment->reviewer->institution }}
+                                                        </small>
                                                     </div>
-                                                    <span class="badge bg-{{ 
-                                                        $assignment->review->recommendation == 'accept' ? 'success' : 
-                                                        ($assignment->review->recommendation == 'reject' ? 'danger' : 'warning') 
-                                                    }}">
+                                                    <span class="badge 
+                                                        bg-{{ 
+                                                            $assignment->review->recommendation === 'accept' ? 'success' :
+                                                            ($assignment->review->recommendation === 'reject' ? 'danger' : 'warning')
+                                                        }}">
                                                         {{ ucfirst(str_replace('_', ' ', $assignment->review->recommendation)) }}
                                                     </span>
                                                 </div>
-                                                
-                                                <p class="card-text">
-                                                    <small>
-                                                        {{ Str::limit($assignment->review->comments_to_editor, 100) }}
-                                                    </small>
+
+                                                <p class="text-muted small mb-3">
+                                                    {{ Str::limit($assignment->review->comments_to_editor, 120) }}
                                                 </p>
-                                                
-                                                <!-- Scores -->
-                                                <div class="mt-3">
-                                                    <small class="text-muted d-block mb-1">Scores:</small>
-                                                    <div class="d-flex flex-wrap gap-1">
-                                                        <span class="badge bg-secondary">O: {{ $assignment->review->originality_score }}/5</span>
-                                                        <span class="badge bg-secondary">C: {{ $assignment->review->contribution_score }}/5</span>
-                                                        <span class="badge bg-secondary">M: {{ $assignment->review->methodology_score }}/5</span>
-                                                        <span class="badge bg-secondary">O: {{ $assignment->review->overall_score }}/5</span>
-                                                    </div>
+
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    <span class="badge bg-secondary">O: {{ $assignment->review->originality_score }}/5</span>
+                                                    <span class="badge bg-secondary">C: {{ $assignment->review->contribution_score }}/5</span>
+                                                    <span class="badge bg-secondary">M: {{ $assignment->review->methodology_score }}/5</span>
+                                                    <span class="badge bg-secondary">Overall: {{ $assignment->review->overall_score }}/5</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -131,182 +139,131 @@
                     @endif
                 </div>
 
-                <!-- Decision Form -->
+                {{-- ===================== DECISION FORM ===================== --}}
                 <form action="{{ route('editor.papers.store-decision', $paper) }}" method="POST">
                     @csrf
-                    
-                    <div class="mb-4">
-                        <h6 class="border-bottom pb-2 mb-3">Editorial Decision</h6>
-                        
-                        <!-- Decision Options -->
-                        <div class="row mb-4">
-                            <div class="col-md-3 mb-3">
-                                <div class="card decision-option border-success text-center h-100" data-decision="accept">
+
+                    <h6 class="fw-semibold border-bottom pb-2 mb-3">
+                        Editorial Decision
+                    </h6>
+
+                    <div class="row g-3 mb-4">
+                        @foreach([
+                            'accept' => ['icon' => 'check-circle', 'color' => 'success', 'label' => 'Accept'],
+                            'minor_revision' => ['icon' => 'edit', 'color' => 'warning', 'label' => 'Minor Revision'],
+                            'major_revision' => ['icon' => 'redo', 'color' => 'warning', 'label' => 'Major Revision'],
+                            'reject' => ['icon' => 'times-circle', 'color' => 'danger', 'label' => 'Reject'],
+                        ] as $key => $opt)
+                            <div class="col-md-3 col-sm-6">
+                                <div class="card decision-option h-100 text-center border {{ 'border-' . $opt['color'] }}"
+                                     data-decision="{{ $key }}">
                                     <div class="card-body py-4">
-                                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                        <h5 class="card-title text-success">Accept</h5>
-                                        <p class="card-text small">Paper accepted for publication</p>
+                                        <i class="fas fa-{{ $opt['icon'] }} fa-3x text-{{ $opt['color'] }} mb-3"></i>
+                                        <h6 class="fw-semibold text-{{ $opt['color'] }}">
+                                            {{ $opt['label'] }}
+                                        </h6>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="col-md-3 mb-3">
-                                <div class="card decision-option border-warning text-center h-100" data-decision="minor_revision">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-edit fa-3x text-warning mb-3"></i>
-                                        <h5 class="card-title text-warning">Minor Revision</h5>
-                                        <p class="card-text small">Minor changes required</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-3 mb-3">
-                                <div class="card decision-option border-warning text-center h-100" data-decision="major_revision">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-redo fa-3x text-warning mb-3"></i>
-                                        <h5 class="card-title text-warning">Major Revision</h5>
-                                        <p class="card-text small">Significant changes required</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-3 mb-3">
-                                <div class="card decision-option border-danger text-center h-100" data-decision="reject">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
-                                        <h5 class="card-title text-danger">Reject</h5>
-                                        <p class="card-text small">Paper not suitable</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Hidden Decision Field -->
-                        <input type="hidden" name="decision" id="decision" value="{{ old('decision') }}" required>
-                        @error('decision')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                        
-                        <!-- Editor Notes -->
-                        <div class="mb-3">
-                            <label for="editor_notes" class="form-label">Decision Notes (Optional)</label>
-                            <textarea class="form-control @error('editor_notes') is-invalid @enderror" 
-                                      id="editor_notes" name="editor_notes" rows="4">{{ old('editor_notes') }}</textarea>
-                            @error('editor_notes')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="text-muted">
-                                Provide feedback to the author. This will be included in the decision email.
-                            </small>
-                        </div>
-                        
-                        <!-- Notify Author -->
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="notify_author" name="notify_author" value="1" checked>
-                            <label class="form-check-label" for="notify_author">
-                                Send email notification to author
-                            </label>
-                        </div>
+                        @endforeach
                     </div>
 
-                    <!-- Submission -->
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                    <input type="hidden" name="decision" id="decision" value="{{ old('decision') }}" required>
+                    @error('decision')
+                        <div class="text-danger small mb-3">{{ $message }}</div>
+                    @enderror
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Decision Notes</label>
+                        <textarea class="form-control" name="editor_notes" rows="4">{{ old('editor_notes') }}</textarea>
+                        <small class="text-muted">
+                            This message will be sent to the author.
+                        </small>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" name="notify_author" value="1" checked>
+                        <label class="form-check-label">
+                            Notify author via email
+                        </label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" id="submitBtn" class="btn btn-success btn-lg">
                             <i class="fas fa-gavel me-2"></i> Submit Decision
                         </button>
-                        <a href="{{ route('editor.papers.show', $paper) }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('editor.papers.show', $paper) }}" class="btn btn-outline-secondary btn-lg">
                             Cancel
                         </a>
                     </div>
                 </form>
+
             </div>
         </div>
-        
-        <!-- Decision Guidelines -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i> Decision Guidelines</h6>
+
+        {{-- ===================== GUIDELINES ===================== --}}
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    Decision Guidelines
+                </h6>
             </div>
-            <div class="card-body">
+            <div class="card-body small">
                 <ul class="mb-0">
-                    <li><strong>Accept:</strong> Paper meets all criteria and requires no changes</li>
-                    <li><strong>Minor Revision:</strong> Small changes needed, can be approved by editor</li>
-                    <li><strong>Major Revision:</strong> Significant changes needed, requires re-review</li>
-                    <li><strong>Reject:</strong> Paper does not meet journal standards</li>
+                    <li><strong>Accept:</strong> No revision required</li>
+                    <li><strong>Minor Revision:</strong> Small changes, editor verification</li>
+                    <li><strong>Major Revision:</strong> Re-review required</li>
+                    <li><strong>Reject:</strong> Does not meet journal standards</li>
                 </ul>
             </div>
         </div>
+
     </div>
 </div>
 
 <style>
-    .decision-option {
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .decision-option:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    
-    .decision-option.selected {
-        background-color: rgba(67, 97, 238, 0.05);
-        border-width: 2px;
-    }
+.icon-shape {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.decision-option {
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.decision-option:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.08);
+}
+
+.decision-option.selected {
+    outline: 3px solid rgba(13,110,253,.25);
+}
 </style>
 
 @push('scripts')
 <script>
-    // Decision selection
-    document.querySelectorAll('.decision-option').forEach(option => {
-        option.addEventListener('click', function() {
-            // Remove selected class from all options
-            document.querySelectorAll('.decision-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            
-            // Add selected class to clicked option
-            this.classList.add('selected');
-            
-            // Set hidden input value
-            const decision = this.getAttribute('data-decision');
-            document.getElementById('decision').value = decision;
-            
-            // Update submit button color based on decision
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.className = submitBtn.className.replace(/btn-(success|warning|danger)/, '');
-            
-            if (decision === 'accept') {
-                submitBtn.classList.add('btn-success');
-            } else if (decision === 'reject') {
-                submitBtn.classList.add('btn-danger');
-            } else {
-                submitBtn.classList.add('btn-warning');
-            }
-        });
+document.querySelectorAll('.decision-option').forEach(option => {
+    option.addEventListener('click', function () {
+        document.querySelectorAll('.decision-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+
+        const decision = this.dataset.decision;
+        document.getElementById('decision').value = decision;
+
+        const btn = document.getElementById('submitBtn');
+        btn.className = 'btn btn-lg';
+
+        if (decision === 'accept') btn.classList.add('btn-success');
+        else if (decision === 'reject') btn.classList.add('btn-danger');
+        else btn.classList.add('btn-warning');
     });
-    
-    // Form validation
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const decision = document.getElementById('decision').value;
-        
-        if (!decision) {
-            e.preventDefault();
-            alert('Please select a decision option.');
-            return false;
-        }
-        
-        if (decision === 'reject' && !confirm('Are you sure you want to reject this paper?')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-    
-    // Initialize with first option selected if not already
-    if (!document.getElementById('decision').value) {
-        document.querySelector('.decision-option').click();
-    }
+});
 </script>
 @endpush
 @endsection

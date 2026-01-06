@@ -270,7 +270,11 @@
                 <i class="fas fa-file-alt"></i> Papers
             </a>
             <a href="{{ route('editor.issues.index') }}" class="{{ request()->routeIs('editor.issues.*') ? 'active' : '' }}">
-                <i class="fas fa-book nav-icon"></i> Issues
+                <i class="fas fa-layer-group"></i> Issues
+            </a>
+
+            <a href="{{ route('editor.reviews.index') }}" class="{{ request()->routeIs('editor.reviews.*') ? 'active' : '' }}">
+                <i class="fas fa-clipboard-check"></i> Reviews
             </a>
         @endif
 

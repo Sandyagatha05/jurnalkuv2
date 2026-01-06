@@ -198,7 +198,7 @@
                 <div class="d-none d-md-flex align-items-center gap-1">
                     @auth
                         <a href="{{ route('dashboard') }}" class="nav-link-desktop d-flex align-items-center">
-                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                            <i class="fas fa-chart-line me-1"></i> Dashboard
                         </a>
                     @else
                         <!-- Login: plain → hover: yellow square + blue text -->

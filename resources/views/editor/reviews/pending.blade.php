@@ -3,108 +3,152 @@
 @section('page-title', 'Pending Reviews')
 @section('page-description', 'Monitor pending review assignments')
 
-@section('page-actions')
-    <a href="{{ route('editor.reviews.index') }}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> All Reviews
-    </a>
-@endsection
-
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">
-            <i class="fas fa-clock me-2 text-warning"></i> Pending Reviews
-            <span class="badge bg-warning">{{ $assignments->total() }}</span>
-        </h5>
-    </div>
-    <div class="card-body">
-        @if($assignments->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Paper</th>
-                            <th>Reviewer</th>
-                            <th>Assigned</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($assignments as $assignment)
-                            <tr>
-                                <td>
-                                    <a href="{{ route('editor.papers.show', $assignment->paper) }}" class="text-decoration-none">
-                                        {{ Str::limit($assignment->paper->title, 50) }}
-                                    </a>
-                                </td>
-                                <td>{{ $assignment->reviewer->name }}</td>
-                                <td>{{ $assignment->assigned_date->format('M d, Y') }}</td>
-                                <td>
-                                    <span class="{{ $assignment->due_date < now() ? 'text-danger' : '' }}">
-                                        {{ $assignment->due_date->format('M d, Y') }}
-                                    </span>
-                                    @if($assignment->due_date < now())
-                                        <br>
-                                        <small class="text-danger">
-                                            <i class="fas fa-exclamation-circle"></i> Overdue
-                                        </small>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="badge bg-warning">Pending</span>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('editor.papers.show', $assignment->paper) }}" class="btn btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <button class="btn btn-outline-warning" onclick="sendReminder({{ $assignment->id }})">
-                                            <i class="fas fa-bell"></i> Remind
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+<div class="row justify-content-center">
+    <div class="col-xl-11">
+
+        {{-- Toolbar --}}
+        <div class="mb-3">
+            <a href="{{ route('editor.reviews.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> All Reviews
+            </a>
+        </div>
+
+        {{-- Main Card --}}
+        <div class="card shadow-sm">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2 text-warning"></i> Pending Reviews
+                </h5>
+                <span class="badge bg-warning">
+                    {{ $assignments->total() }}
+                </span>
             </div>
 
-            {{ $assignments->links() }}
-        @else
-            <div class="text-center py-5">
-                <i class="fas fa-check-circle fa-4x text-success mb-4"></i>
-                <h4 class="text-success mb-3">All Caught Up!</h4>
-                <p class="text-muted">No pending review assignments.</p>
+            <div class="card-body">
+
+                @if($assignments->count())
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Paper</th>
+                                    <th>Reviewer</th>
+                                    <th>Assigned</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($assignments as $assignment)
+                                    @php
+                                        $isOverdue = $assignment->due_date < now();
+                                    @endphp
+
+                                    <tr>
+                                        <td style="max-width: 280px;">
+                                            <a href="{{ route('editor.papers.show', $assignment->paper) }}"
+                                               class="fw-semibold text-decoration-none d-block text-truncate">
+                                                {{ $assignment->paper->title }}
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            {{ $assignment->reviewer->name }}
+                                        </td>
+
+                                        <td>
+                                            <span class="small">
+                                                {{ $assignment->assigned_date->format('M d, Y') }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <span class="{{ $isOverdue ? 'text-danger fw-semibold' : '' }}">
+                                                {{ $assignment->due_date->format('M d, Y') }}
+                                            </span>
+
+                                            @if($isOverdue)
+                                                <div class="small text-danger">
+                                                    <i class="fas fa-exclamation-circle me-1"></i> Overdue
+                                                </div>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            <span class="badge bg-warning">
+                                                Pending
+                                            </span>
+                                        </td>
+
+                                        <td class="text-end">
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ route('editor.papers.show', $assignment->paper) }}"
+                                                   class="btn btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button type="button"
+                                                        class="btn btn-outline-warning"
+                                                        onclick="sendReminder({{ $assignment->id }})">
+                                                    <i class="fas fa-bell"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Pagination --}}
+                    <div class="mt-3">
+                        {{ $assignments->links() }}
+                    </div>
+
+                @else
+                    {{-- Empty State --}}
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle fa-4x text-success mb-4"></i>
+                        <h4 class="text-success mb-2">All Caught Up!</h4>
+                        <p class="text-muted mb-0">
+                            No pending review assignments.
+                        </p>
+                    </div>
+                @endif
+
             </div>
-        @endif
+        </div>
+
+        {{-- Scripts --}}
+        @push('scripts')
+        <script>
+            function sendReminder(assignmentId) {
+                if (!confirm('Send reminder email to reviewer?')) return;
+
+                fetch(`/editor/reviews/assignments/${assignmentId}/remind`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Reminder sent successfully!');
+                    } else {
+                        alert('Failed to send reminder.');
+                    }
+                })
+                .catch(() => {
+                    alert('Error sending reminder.');
+                });
+            }
+        </script>
+        @endpush
+
     </div>
 </div>
-
-@push('scripts')
-<script>
-    function sendReminder(assignmentId) {
-        if (confirm('Send reminder email to reviewer?')) {
-            fetch(`/editor/reviews/assignments/${assignmentId}/remind`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Reminder sent successfully!');
-                }
-            })
-            .catch(error => {
-                alert('Error sending reminder.');
-                console.error(error);
-            });
-        }
-    }
-</script>
-@endpush
 @endsection
