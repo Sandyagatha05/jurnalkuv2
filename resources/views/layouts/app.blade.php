@@ -279,6 +279,9 @@
         @endif
 
         @if(Auth::user()->hasRole('author'))
+            <a href="{{ route('author.papers.index') }}" class="{{ request()->routeIs('author.papers.*') ? 'active' : '' }}">
+                <i class="fas fa-file-alt"></i> My Papers
+            </a>
             <a href="{{ route('author.papers.create') }}" class="{{ request()->routeIs('author.papers.create') ? 'active' : '' }}">
                 <i class="fas fa-upload"></i> Submit Paper
             </a>

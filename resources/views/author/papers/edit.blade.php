@@ -3,58 +3,109 @@
 @section('page-title', 'Edit Paper')
 @section('page-description', 'Edit paper before review process')
 
+{{-- RULE: page-actions MUST be empty --}}
 @section('page-actions')
-    <a href="{{ route('author.papers.index') }}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Back to Papers
-    </a>
 @endsection
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Edit Paper: {{ $paper->title }}</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('author.papers.update', $paper) }}" method="POST" enctype="multipart/form-data">
+    <div class="col-xl-8 col-lg-9">
+
+        {{-- Top Navigation --}}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Edit Paper</h4>
+            <a href="{{ route('author.papers.show', $paper) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Paper
+            </a>
+        </div>
+
+        {{-- Main Card --}}
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                {{-- Header --}}
+                <div class="mb-4">
+                    <h5 class="mb-1">{{ $paper->title }}</h5>
+                    <small class="text-muted">
+                        Last updated {{ $paper->updated_at->format('F d, Y H:i') }}
+                    </small>
+                </div>
+
+                <form action="{{ route('author.papers.update', $paper) }}"
+                      method="POST"
+                      enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
-                    
+
+                    {{-- Title --}}
                     <div class="mb-3">
-                        <label for="title" class="form-label">Paper Title *</label>
-                        <input type="text" class="form-control" id="title" name="title" 
-                               value="{{ old('title', $paper->title) }}" required>
+                        <label for="title" class="form-label fw-semibold">
+                            Paper Title <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="title"
+                               name="title"
+                               value="{{ old('title', $paper->title) }}"
+                               required>
                     </div>
-                    
+
+                    {{-- Abstract --}}
                     <div class="mb-3">
-                        <label for="abstract" class="form-label">Abstract *</label>
-                        <textarea class="form-control" id="abstract" name="abstract" rows="5" required>{{ old('abstract', $paper->abstract) }}</textarea>
+                        <label for="abstract" class="form-label fw-semibold">
+                            Abstract <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control"
+                                  id="abstract"
+                                  name="abstract"
+                                  rows="6"
+                                  required>{{ old('abstract', $paper->abstract) }}</textarea>
                     </div>
-                    
+
+                    {{-- Keywords --}}
                     <div class="mb-3">
-                        <label for="keywords" class="form-label">Keywords *</label>
-                        <input type="text" class="form-control" id="keywords" name="keywords" 
-                               value="{{ old('keywords', $paper->keywords) }}" required>
+                        <label for="keywords" class="form-label fw-semibold">
+                            Keywords <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="keywords"
+                               name="keywords"
+                               value="{{ old('keywords', $paper->keywords) }}"
+                               placeholder="e.g. Machine Learning, Recommender System"
+                               required>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="paper_file" class="form-label">Upload New Paper (PDF) - Optional</label>
-                        <input type="file" class="form-control" id="paper_file" name="paper_file" accept=".pdf">
-                        <small class="text-muted">Current file: {{ $paper->original_filename }}</small>
+
+                    {{-- File Upload --}}
+                    <div class="mb-4">
+                        <label for="paper_file" class="form-label fw-semibold">
+                            Upload New Paper (PDF)
+                        </label>
+                        <input type="file"
+                               class="form-control"
+                               id="paper_file"
+                               name="paper_file"
+                               accept=".pdf">
+                        <small class="text-muted d-block mt-1">
+                            Current file: <strong>{{ $paper->original_filename }}</strong>
+                        </small>
                     </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i> Update Paper
-                        </button>
-                        <a href="{{ route('author.papers.show', $paper) }}" class="btn btn-outline-secondary">
+
+                    {{-- Actions --}}
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ route('author.papers.show', $paper) }}"
+                           class="btn btn-outline-secondary">
                             Cancel
                         </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Update Paper
+                        </button>
                     </div>
+
                 </form>
             </div>
         </div>
+
     </div>
 </div>
 @endsection
