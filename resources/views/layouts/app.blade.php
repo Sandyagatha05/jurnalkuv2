@@ -269,6 +269,9 @@
             <a href="{{ route('editor.papers.index') }}" class="{{ request()->routeIs('editor.papers.*') ? 'active' : '' }}">
                 <i class="fas fa-file-alt"></i> Papers
             </a>
+            <a href="{{ route('editor.issues.index') }}" class="{{ request()->routeIs('editor.issues.*') ? 'active' : '' }}">
+                <i class="fas fa-book nav-icon"></i> Issues
+            </a>
         @endif
 
         @if(Auth::user()->hasRole('author'))

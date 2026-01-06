@@ -1,104 +1,131 @@
 @extends('layouts.app')
 
-@section('page-title', 'Manage Issues')
-@section('page-description', 'View and manage all journal issues')
-
-@section('page-actions')
-    <a href="{{ route('editor.issues.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus-circle me-1"></i> Create New Issue
-    </a>
-@endsection
+@section('title', 'Manage Issues')
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">All Issues</h5>
-    </div>
-    <div class="card-body">
-        <!-- Filter Tabs -->
-        <ul class="nav nav-tabs mb-4" id="issueTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">
-                    All Issues <span class="badge bg-secondary">{{ $issues->total() }}</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="published-tab" data-bs-toggle="tab" data-bs-target="#published" type="button">
-                    Published <span class="badge bg-secondary">{{ $issues->where('status', 'published')->count() }}</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="draft-tab" data-bs-toggle="tab" data-bs-target="#draft" type="button">
-                    Draft <span class="badge bg-secondary">{{ $issues->where('status', 'draft')->count() }}</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="archived-tab" data-bs-toggle="tab" data-bs-target="#archived" type="button">
-                    Archived <span class="badge bg-secondary">{{ $issues->where('status', 'archived')->count() }}</span>
-                </button>
-            </li>
-        </ul>
+<div class="container-fluid">
 
-        <!-- Tab Content -->
-        <div class="tab-content" id="issueTabsContent">
-            <!-- All Issues -->
-            <div class="tab-pane fade show active" id="all" role="tabpanel">
-                @include('editor.issues.partials.issues-table', ['issues' => $issues])
+    {{-- Page Header --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Manage Issues</h4>
+            <p class="text-muted mb-0">View and manage all journal issues</p>
+        </div>
+        <a href="{{ route('editor.issues.create') }}" class="btn btn-primary btn-lift">
+            <i class="fas fa-plus-circle me-1"></i> Create New Issue
+        </a>
+    </div>
+
+    {{-- Empty State --}}
+    @if($issues->isEmpty())
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-book-open fs-1 text-muted mb-3"></i>
+                <h5 class="mb-2">No Issues Created Yet</h5>
+                <p class="text-muted mb-4">
+                    Start by creating your first journal issue.
+                </p>
+                <a href="{{ route('editor.issues.create') }}" class="btn btn-primary btn-lift">
+                    <i class="fas fa-plus-circle me-1"></i> Create First Issue
+                </a>
             </div>
-            
-            <!-- Published -->
-            <div class="tab-pane fade" id="published" role="tabpanel">
-                @include('editor.issues.partials.issues-table', [
-                    'issues' => $issues->where('status', 'published')
-                ])
-            </div>
-            
-            <!-- Draft -->
-            <div class="tab-pane fade" id="draft" role="tabpanel">
-                @include('editor.issues.partials.issues-table', [
-                    'issues' => $issues->where('status', 'draft')
-                ])
-            </div>
-            
-            <!-- Archived -->
-            <div class="tab-pane fade" id="archived" role="tabpanel">
-                @include('editor.issues.partials.issues-table', [
-                    'issues' => $issues->where('status', 'archived')
-                ])
+        </div>
+    @else
+
+    {{-- Issues Card --}}
+    <div class="card">
+        <div class="card-body">
+
+            {{-- Tabs --}}
+            <ul class="nav nav-pills gap-2 mb-4" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#all">
+                        All
+                        <span class="badge bg-secondary ms-1">
+                            {{ $issues->total() }}
+                        </span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#published">
+                        Published
+                        <span class="badge bg-success ms-1">
+                            {{ $issues->where('status','published')->count() }}
+                        </span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#draft">
+                        Draft
+                        <span class="badge bg-warning ms-1">
+                            {{ $issues->where('status','draft')->count() }}
+                        </span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#archived">
+                        Archived
+                        <span class="badge bg-secondary ms-1">
+                            {{ $issues->where('status','archived')->count() }}
+                        </span>
+                    </button>
+                </li>
+            </ul>
+
+            {{-- Tab Content --}}
+            <div class="tab-content">
+
+                <div class="tab-pane fade show active" id="all">
+                    @include('editor.issues.partials.issues-table', [
+                        'issues' => $issues
+                    ])
+                </div>
+
+                <div class="tab-pane fade" id="published">
+                    @include('editor.issues.partials.issues-table', [
+                        'issues' => $issues->where('status','published')
+                    ])
+                </div>
+
+                <div class="tab-pane fade" id="draft">
+                    @include('editor.issues.partials.issues-table', [
+                        'issues' => $issues->where('status','draft')
+                    ])
+                </div>
+
+                <div class="tab-pane fade" id="archived">
+                    @include('editor.issues.partials.issues-table', [
+                        'issues' => $issues->where('status','archived')
+                    ])
+                </div>
+
             </div>
         </div>
     </div>
+    @endif
 </div>
 
-@if($issues->isEmpty())
-<div class="text-center py-5">
-    <i class="fas fa-book-open fa-4x text-muted mb-4"></i>
-    <h4 class="text-muted mb-3">No Issues Created Yet</h4>
-    <p class="text-muted mb-4">Start by creating your first journal issue.</p>
-    <a href="{{ route('editor.issues.create') }}" class="btn btn-primary btn-lg">
-        <i class="fas fa-plus-circle me-2"></i> Create First Issue
-    </a>
-</div>
-@endif
-@endsection
-
-@push('styles')
+{{-- Local Styles --}}
 <style>
-    .nav-tabs .nav-link {
-        color: #6c757d;
-        font-weight: 500;
-    }
-    
-    .nav-tabs .nav-link.active {
-        color: #4361ee;
-        font-weight: 600;
-    }
-    
-    .issue-title {
-        max-width: 300px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+.nav-pills .nav-link {
+    color: var(--foreground);
+    background: #f8f9fa;
+    border-radius: .5rem;
+    font-weight: 500;
+}
+
+.nav-pills .nav-link.active {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.btn-lift {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.btn-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
 </style>
-@endpush
+@endsection

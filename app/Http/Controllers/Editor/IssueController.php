@@ -39,7 +39,7 @@ class IssueController extends Controller
         $years = Issue::published()->distinct()->pluck('year')->sortDesc();
         $volumes = Issue::published()->distinct()->pluck('volume')->sortDesc();
         
-        return view('issues.index', compact('issues', 'years', 'volumes'));
+        return view('editor.issues.index', compact('issues', 'years', 'volumes'));
     }
 
     /**
@@ -121,7 +121,7 @@ class IssueController extends Controller
         // Extract categories from papers (example)
         $categories = $issue->papers->pluck('category')->filter()->unique()->values();
         
-        return view('issues.show', compact('issue', 'previousIssue', 'nextIssue', 'categories'));
+        return view('editor.issues.show', compact('issue', 'previousIssue', 'nextIssue', 'categories'));
     }
 
     /**
