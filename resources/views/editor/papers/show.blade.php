@@ -205,7 +205,7 @@
                             <option value="published" {{ $paper->status == 'published' ? 'selected' : '' }}>Published</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary w-100">Update Status</button>
+                    <button onclick="return confirm('Are you sure?')" class="btn btn-primary w-100">Update Status</button>
                 </form>
             </div>
         </div>

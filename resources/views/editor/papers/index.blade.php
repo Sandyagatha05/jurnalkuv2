@@ -4,6 +4,7 @@
 @section('page-description', 'View and manage all paper submissions')
 
 @section('content')
+
 <div class="card">
 
     {{-- HEADER --}}
@@ -225,12 +226,33 @@
 
         {{-- FOOTER --}}
         <div class="d-flex justify-content-between align-items-center mt-3">
-            <small class="text-muted">
+            <!-- <small class="text-muted">
                 Showing {{ $papers->firstItem() }}–{{ $papers->lastItem() }} of {{ $papers->total() }}
-            </small>
+            </small> -->
 
             {{ $papers->links() }}
         </div>
     </div>
 </div>
+
+<style>
+/* Target all SVGs in pagination more aggressively */
+svg[class*="w-5"],
+svg[class*="h-5"],
+.pagination svg,
+nav[role="navigation"] svg {
+    width: 12px !important;
+    height: 12px !important;
+}
+
+/* Target Livewire/Tailwind pagination specifically */
+.relative svg,
+a[rel="prev"] svg,
+a[rel="next"] svg,
+span[aria-hidden="true"] svg {
+    width: 12px !important;
+    height: 12px !important;
+}
+</style>
+
 @endsection

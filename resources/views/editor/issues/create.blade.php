@@ -155,7 +155,7 @@
 
                         {{-- Actions --}}
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary btn-lift">
+                            <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary btn-lift">
                                 <i class="fas fa-plus-circle me-1"></i> Create Issue
                             </button>
                             <a href="{{ route('editor.issues.index') }}"

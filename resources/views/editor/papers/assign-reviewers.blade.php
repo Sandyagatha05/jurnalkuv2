@@ -179,7 +179,7 @@
 
                     {{-- Actions --}}
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
+                        <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-user-plus me-2"></i> Assign Reviewers & Start Review
                         </button>
                         <a href="{{ route('editor.papers.show', $paper) }}" class="btn btn-outline-secondary">

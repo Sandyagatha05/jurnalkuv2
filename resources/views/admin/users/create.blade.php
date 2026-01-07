@@ -144,7 +144,7 @@
 
                         {{-- Actions --}}
                         <div class="d-flex gap-2">
-                            <button type="submit"
+                            <button onclick="return confirm('Are you sure?')" type="submit"
                                     class="btn btn-primary">
                                 <i class="ri-user-add-line me-1"></i>
                                 Create User
