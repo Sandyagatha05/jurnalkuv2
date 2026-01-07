@@ -151,7 +151,7 @@
                     {{-- Actions --}}
                     {{-- ========= --}}
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
+                        <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-paper-plane me-2"></i> Submit Paper
                         </button>
                         <a href="{{ route('author.papers.index') }}" class="btn btn-outline-secondary btn-lg">

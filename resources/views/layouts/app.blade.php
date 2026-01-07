@@ -311,7 +311,7 @@
     <div class="sidebar-footer">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button class="btn btn-outline-danger w-100">
+            <button onclick="return confirm('Are you sure?')" class="btn btn-outline-danger w-100">
                 <i class="fas fa-sign-out-alt me-2"></i> Logout
             </button>
         </form>

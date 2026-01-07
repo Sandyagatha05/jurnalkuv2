@@ -97,7 +97,7 @@
                            class="btn btn-outline-secondary">
                             Cancel
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-1"></i> Update Paper
                         </button>
                     </div>

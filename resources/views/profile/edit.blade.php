@@ -134,7 +134,7 @@
                         {{-- ACTIONS --}}
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('profile.show') }}" class="btn btn-outline-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Update Profile</button>
+                            <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Update Profile</button>
                         </div>
                     </form>
                 </div>
@@ -184,7 +184,7 @@
                             </div>
 
                             <div class="col-md-6 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">
+                                <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary w-100">
                                     <i class="fas fa-key me-1"></i> Update Password
                                 </button>
                             </div>
