@@ -287,6 +287,16 @@
             </a>
         @endif
 
+        @if(Auth::user()->hasRole('reviewer'))
+            <a href="{{ route('reviewer.assignments.index') }}" class="{{ request()->routeIs('reviewer.assignments.*') ? 'active' : '' }}">
+                <i class="fas fa-tasks"></i> Assignments
+            </a>
+
+            <a href="{{ route('reviewer.guidelines') }}" class="{{ request()->routeIs('reviewer.guidelines') ? 'active' : '' }}">
+                <i class="fas fa-chalkboard-teacher"></i> Guidelines
+            </a>
+        @endif
+
         <a href="{{ route('profile.show') }}"
             class="{{ request()->routeIs('profile.show') || request()->routeIs('profile.edit') ? 'active' : '' }}">
                 <i class="fas fa-user"></i> Profile
