@@ -163,12 +163,12 @@
                                             @php
                                                 $daysLeft = $assignment->due_date->diffInDays(now(), false);
                                             @endphp
-                                            @if($daysLeft < 0)
-                                                <span class="badge bg-success badge-hover">{{ abs($daysLeft) }} days left</span>
-                                            @elseif($daysLeft == 0)
-                                                <span class="badge bg-warning badge-hover">Due today</span>
+                                            @if((int)$daysLeft < 0)
+                                                <span class="badge bg-success badge-hover">{{ abs((int)$daysLeft) }} days left</span>
+                                            @elseif((int)$daysLeft == 0)
+                                                <span class="badge bg-warning-academic badge-hover text-dark">Due today</span>
                                             @else
-                                                <span class="badge bg-danger badge-hover">{{ $daysLeft }} days overdue</span>
+                                                <span class="badge bg-danger badge-hover">{{ (int)$daysLeft }} days overdue</span>
                                             @endif
                                         </td>
                                         <td>

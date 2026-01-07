@@ -1,36 +1,46 @@
 @extends('layouts.app')
 
-@section('page-title', 'Overdue Assignments')
-@section('page-description', 'Review assignments that are past their due date')
-
-@section('page-actions')
-    <a href="{{ route('reviewer.assignments.pending') }}" class="btn btn-outline-primary">
-        <i class="fas fa-clock me-1"></i> Pending Assignments
-    </a>
-    <a href="{{ route('reviewer.assignments.completed') }}" class="btn btn-outline-success">
-        <i class="fas fa-check-circle me-1"></i> Completed Assignments
-    </a>
-@endsection
+@section('title', 'Overdue Assignments')
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">
-            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-            Overdue Review Assignments
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-0 text-danger">Overdue Assignments</h3>
+        <small class="text-muted">Review assignments that are past their due date</small>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ route('reviewer.assignments.pending') }}" class="btn btn-outline-primary">
+            <i class="fas fa-clock me-1"></i> Pending Assignments
+        </a>
+        <a href="{{ route('reviewer.assignments.completed') }}" class="btn btn-outline-success">
+            <i class="fas fa-check-circle me-1"></i> Completed Assignments
+        </a>
+    </div>
+</div>
+
+@if($assignments->count() > 0)
+    <div class="alert alert-warning border-start border-4 border-warning shadow-sm mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-lg me-3 text-warning"></i>
+            <div>
+                <strong>Action Required:</strong> You have {{ $assignments->count() }} overdue review assignments. 
+                Please complete these reviews as soon as possible.
+            </div>
+        </div>
+    </div>
+@endif
+
+<div class="card shadow-sm hover-scale">
+    <div class="card-header bg-light">
+        <h5 class="mb-0 text-danger">
+            <i class="fas fa-clock me-2"></i> Overdue List
         </h5>
     </div>
     <div class="card-body">
         @if($assignments->count() > 0)
-            <div class="alert alert-warning">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                You have {{ $assignments->count() }} overdue review assignments. 
-                Please complete these reviews as soon as possible.
-            </div>
-
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
                             <th>Paper</th>
                             <th>Author</th>
@@ -46,27 +56,24 @@
                             @endphp
                             <tr>
                                 <td>
-                                    <a href="{{ route('reviewer.assignments.show', $assignment) }}" class="text-decoration-none">
+                                    <a href="{{ route('reviewer.assignments.show', $assignment) }}" class="fw-bold text-dark text-decoration-none">
                                         {{ Str::limit($assignment->paper->title, 60) }}
                                     </a>
-                                    <br>
-                                    <small class="text-muted">ID: #{{ $assignment->paper->id }}</small>
+                                    <div class="small text-muted mt-1">ID: #{{ $assignment->paper->id }}</div>
                                 </td>
                                 <td>
-                                    {{ $assignment->paper->author->name }}
-                                    <br>
+                                    <div class="fw-medium">{{ $assignment->paper->author->name }}</div>
                                     <small class="text-muted">{{ $assignment->paper->author->institution }}</small>
                                 </td>
                                 <td>
-                                    {{ $assignment->due_date->format('M d, Y') }}
-                                    <br>
-                                    <small class="text-warning">
+                                    <div class="fw-bold text-dark">{{ $assignment->due_date->format('M d, Y') }}</div>
+                                    <small class="text-danger fw-semibold">
                                         <i class="far fa-calendar-times me-1"></i>
-                                        Was due {{ $assignment->due_date->diffForHumans() }}
+                                        Due {{ $assignment->due_date->diffForHumans() }}
                                     </small>
                                 </td>
                                 <td>
-                                    <span class="badge bg-danger">{{ $daysOverdue }} day(s)</span>
+                                    <span class="badge bg-danger px-2 py-1">{{ $daysOverdue }} day(s)</span>
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
@@ -76,6 +83,9 @@
                                         <a href="{{ route('reviewer.assignments.view-paper', $assignment) }}" class="btn btn-outline-secondary">
                                             <i class="fas fa-eye"></i>
                                         </a>
+                                        <button type="button" class="btn btn-outline-warning" onclick="requestExtension({{ $assignment->id }})" title="Request Extension">
+                                            <i class="fas fa-hourglass-half"></i>
+                                        </button>
                                         <a href="{{ route('reviewer.assignments.download-paper', $assignment) }}" class="btn btn-outline-danger">
                                             <i class="fas fa-download"></i>
                                         </a>
@@ -87,15 +97,16 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            {{ $assignments->links() }}
+            <div class="mt-4 pt-3 border-top">
+                {{ $assignments->links() }}
+            </div>
         @else
             <div class="text-center py-5">
-                <i class="fas fa-check-circle fa-4x text-success mb-4"></i>
-                <h4 class="text-success mb-3">No Overdue Assignments</h4>
-                <p class="text-muted mb-4">
-                    Great job! You have no overdue review assignments.
-                </p>
+                <div class="mb-3">
+                    <i class="fas fa-check-circle fa-4x text-success opacity-50"></i>
+                </div>
+                <h4 class="text-success mb-2">No Overdue Assignments</h4>
+                <p class="text-muted mb-4">Great job! You have no overdue review assignments.</p>
                 <a href="{{ route('reviewer.assignments.pending') }}" class="btn btn-primary">
                     <i class="fas fa-tasks me-2"></i> View Pending Assignments
                 </a>
@@ -104,7 +115,6 @@
     </div>
 </div>
 
-<!-- Request Extension Modal -->
 <div class="modal fade" id="requestExtensionModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -135,6 +145,18 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+    .hover-scale {
+        transition: all 0.3s ease;
+    }
+    .hover-scale:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>

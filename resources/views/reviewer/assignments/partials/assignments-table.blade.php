@@ -115,8 +115,9 @@
     @endif
 @else
     <div class="text-center py-5">
-        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
-        <p class="text-muted">No assignments found in this category.</p>
+        <i class="fas fa-tasks fa-4x text-muted mb-4"></i>
+        <h4 class="text-muted mb-3">No Review Assignments</h4>
+        <p class="text-muted mb-4">You have not been assigned any papers to review yet.</p>
     </div>
 @endif
 

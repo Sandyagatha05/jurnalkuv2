@@ -3,13 +3,20 @@
 @section('page-title', 'Admin Dashboard')
 @section('page-description', 'Manage system settings, users, and roles')
 
-@section('page-actions')
-    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
-        <i class="fas fa-user-plus me-1"></i> Add User
-    </a>
-@endsection
-
 @section('content')
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1">Admin Dashboard</h4>
+        <p class="text-muted mb-0">Manage system settings, users, and roles</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+            <i class="fas fa-user-plus me-1"></i> Add User
+        </a>
+    </div>
+</div>
+
 <div class="row g-4">
 
     <!-- ===================== -->
