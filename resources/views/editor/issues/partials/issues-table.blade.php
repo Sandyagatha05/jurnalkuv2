@@ -104,60 +104,66 @@
 @push('scripts')
 <script>
     function publishIssue(issueId) {
-        if (confirm('Are you sure you want to publish this issue?')) {
-            fetch(`/editor/issues/${issueId}/publish`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error publishing issue');
-                }
-            });
-        }
+        customConfirm('Are you sure you want to publish this issue?').then(result => {
+            if (result) {
+                fetch(`/editor/issues/${issueId}/publish`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error publishing issue');
+                    }
+                });
+            }
+        })
     }
     
     function unpublishIssue(issueId) {
-        if (confirm('Are you sure you want to unpublish this issue?')) {
-            fetch(`/editor/issues/${issueId}/unpublish`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error unpublishing issue');
-                }
-            });
-        }
+        customConfirm('Are you sure you want to unpublish this issue?').then(result => {
+            if (result) {
+                fetch(`/editor/issues/${issueId}/unpublish`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error unpublishing issue');
+                    }
+                });
+            }
+        });
     }
     
     function deleteIssue(issueId) {
-        if (confirm('Are you sure you want to delete this issue? This cannot be undone.')) {
-            fetch(`/editor/issues/${issueId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error deleting issue');
-                }
-            });
-        }
+        customConfirm('Are you sure you want to delete this issue?<br>This action cannot be undone.').then(result => {
+            if (result) {
+                fetch(`/editor/issues/${issueId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error deleting issue');
+                    }
+                });
+            }
+        });
     }
 </script>
 @endpush

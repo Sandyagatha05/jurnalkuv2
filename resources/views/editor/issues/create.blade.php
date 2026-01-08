@@ -23,7 +23,9 @@
             <div class="card">
                 <div class="card-body">
 
-                    <form action="{{ route('editor.issues.store') }}" method="POST">
+                    <form action="{{ route('editor.issues.store') }}" method="POST"
+                    onsubmit="event.preventDefault(); customConfirm('Are you sure you want to create this issue?').then(result => {
+                    if(result) this.submit(); });">
                         @csrf
 
                         {{-- Issue Identification --}}
@@ -155,7 +157,7 @@
 
                         {{-- Actions --}}
                         <div class="d-flex gap-2">
-                            <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary btn-lift">
+                            <button type="submit" class="btn btn-primary btn-lift">
                                 <i class="fas fa-plus-circle me-1"></i> Create Issue
                             </button>
                             <a href="{{ route('editor.issues.index') }}"
