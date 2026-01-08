@@ -176,12 +176,12 @@
                 @endif
 
                 @if(auth()->user()->hasRole('admin'))
-                    <button class="btn btn-outline-danger"
-                            onclick="confirm('Delete this review?') && document.getElementById('delete-review').submit()">
+                    <button class="btn btn-outline-danger">
                         <i class="fas fa-trash me-2"></i> Delete Review
                     </button>
 
-                    <form id="delete-review" action="{{ route('reviews.destroy', $review) }}" method="POST" class="d-none">
+                    <form id="delete-review" action="{{ route('reviews.destroy', $review) }}" method="POST" class="d-none" onsubmit="event.preventDefault();
+                    customConfirm('Are you sure you want to delete this review?<br>This action can not be undone.').then(result => { if(result) this.submit(); });">
                         @csrf
                         @method('DELETE')
                     </form>
