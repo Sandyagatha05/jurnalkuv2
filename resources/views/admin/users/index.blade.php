@@ -318,9 +318,10 @@ document.getElementById('selectAll').addEventListener('change', function () {
 });
 
 function confirmDelete(userId) {
-    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    customConfirm('Are you sure you want to delete this user?<br>This action cannot be undone.').then(result => {
+        if(result)
         document.getElementById('delete-form-' + userId).submit();
-    }
+    });
 }
 
 document.getElementById('searchInput').addEventListener('keyup', function () {

@@ -41,7 +41,8 @@
                     @endif
 
                     <form method="POST"
-                          action="{{ route('admin.users.update', $user) }}">
+                          action="{{ route('admin.users.update', $user) }}"
+                          onsubmit="event.preventDefault(); customConfirm('Are you sure you want to update this user?').then(result => { if(result) this.submit(); });">
                         @csrf
                         @method('PUT')
 
@@ -223,9 +224,11 @@
 @push('scripts')
 <script>
     function confirmDelete(id) {
-        if (confirm('Are you sure you want to delete this user?')) {
-            document.getElementById('delete-form-' + id).submit();
-        }
+        customConfirm('Are you sure you want to delete this user?<br>This action can not be undone.').then(result => {
+            if (result) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
     }
 </script>
 @endpush

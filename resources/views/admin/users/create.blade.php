@@ -41,7 +41,8 @@
                     @endif
 
                     <form method="POST"
-                          action="{{ route('admin.users.store') }}">
+                          action="{{ route('admin.users.store') }}"
+                          onsubmit="event.preventDefault(); customConfirm('Are you sure you want to create this user?').then(result => {if(result) this.submit(); });">
                         @csrf
 
                         {{-- Name & Email --}}
@@ -144,7 +145,7 @@
 
                         {{-- Actions --}}
                         <div class="d-flex gap-2">
-                            <button onclick="return confirm('Are you sure?')" type="submit"
+                            <button type="submit"
                                     class="btn btn-primary">
                                 <i class="ri-user-add-line me-1"></i>
                                 Create User
