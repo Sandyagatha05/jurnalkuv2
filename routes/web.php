@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReviewController;
 
 
-
 // Public routes (accessible tanpa authentication)
 require __DIR__.'/public.php';
 

@@ -51,6 +51,7 @@ Route::middleware(['auth', 'editor'])->prefix('editor')->name('editor.')->group(
         // Publish/Unpublish
         Route::post('/{issue}/publish', [IssueController::class, 'publish'])->name('publish');
         Route::post('/{issue}/unpublish', [IssueController::class, 'unpublish'])->name('unpublish');
+        Route::post('/{issue}/change-status', [IssueController::class, 'changeStatus'])->name('change-status');
         
         // Editorial Management
         Route::get('/{issue}/editorial', [IssueController::class, 'editorial'])->name('editorial');
@@ -58,6 +59,7 @@ Route::middleware(['auth', 'editor'])->prefix('editor')->name('editor.')->group(
         
         // Add/Remove Papers from Issue
         Route::post('/{issue}/add-paper', [IssueController::class, 'addPaper'])->name('add-paper');
+        Route::patch('/{issue}/papers/{paper}', [IssueController::class, 'updatePaper'])->name('update-paper');
         Route::delete('/{issue}/remove-paper/{paper}', [IssueController::class, 'removePaper'])->name('remove-paper');
     });
     

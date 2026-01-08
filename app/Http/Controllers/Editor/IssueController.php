@@ -12,35 +12,41 @@ class IssueController extends Controller
     /**
      * Display a listing of issues.
      */
-    public function index()
-    {
-        $query = Issue::with(['editorial', 'papers'])
-            ->published()
-            ->orderBy('year', 'desc')
-            ->orderBy('volume', 'desc')
-            ->orderBy('number', 'desc');
-        
-        // Filters
-        if (request()->has('year')) {
-            $query->where('year', request('year'));
-        }
-        
-        if (request()->has('volume')) {
-            $query->where('volume', request('volume'));
-        }
-        
-        if (request()->has('search')) {
-            $query->where('title', 'like', '%' . request('search') . '%');
-        }
-        
-        $issues = $query->paginate(12);
-        
-        // Get available years and volumes for filter
-        $years = Issue::published()->distinct()->pluck('year')->sortDesc();
-        $volumes = Issue::published()->distinct()->pluck('volume')->sortDesc();
-        
-        return view('editor.issues.index', compact('issues', 'years', 'volumes'));
+public function index()
+{
+    $query = Issue::with(['editorial', 'papers'])
+        ->orderBy('year', 'desc')
+        ->orderBy('volume', 'desc')
+        ->orderBy('number', 'desc');
+    
+    // Filters
+    if (request()->has('year')) {
+        $query->where('year', request('year'));
     }
+    
+    if (request()->has('volume')) {
+        $query->where('volume', request('volume'));
+    }
+    
+    if (request()->has('search')) {
+        $query->where('title', 'like', '%' . request('search') . '%');
+    }
+    
+    $issues = $query->paginate(12);
+    
+    // Get total counts for badges (across all pages)
+    $statusCounts = [
+        'published' => Issue::where('status', 'published')->count(),
+        'draft' => Issue::where('status', 'draft')->count(),
+        'archived' => Issue::where('status', 'archived')->count(),
+    ];
+    
+    // Get available years and volumes for filter
+    $years = Issue::distinct()->pluck('year')->sortDesc();
+    $volumes = Issue::distinct()->pluck('volume')->sortDesc();
+    
+    return view('editor.issues.index', compact('issues', 'years', 'volumes', 'statusCounts'));
+}
 
     /**
      * Show the form for creating a new issue.
@@ -91,6 +97,29 @@ class IssueController extends Controller
     }
 
     /**
+ * Change issue status.
+ */
+    public function changeStatus(Request $request, Issue $issue)
+    {
+        $request->validate([
+            'status' => 'required|in:draft,published,archived'
+        ]);
+        
+        $issue->status = $request->status;
+        
+        // If publishing, set published date
+        if ($request->status === 'published' && !$issue->published_date) {
+            $issue->published_date = now();
+        }
+        
+        $issue->save();
+        
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
+    }
+
+    
+
+    /**
      * Display the specified issue.
      */
     public function show(Issue $issue)
@@ -127,9 +156,21 @@ class IssueController extends Controller
     /**
      * Show the form for editing the specified issue.
      */
+/**
+ * Show the form for editing the specified issue.
+ */
     public function edit(Issue $issue)
     {
-        return view('editor.issues.edit', compact('issue'));
+        $issue->load(['papers.author']);
+        
+        // Get accepted papers that are not assigned to any issue
+        $availablePapers = Paper::with('author')
+            ->where('status', 'accepted')
+            ->whereNull('issue_id')
+            ->orderBy('submitted_at', 'desc')
+            ->get();
+        
+        return view('editor.issues.edit', compact('issue', 'availablePapers'));
     }
 
     /**
@@ -167,17 +208,19 @@ class IssueController extends Controller
 
     /**
      * Publish the issue.
-     */
+     *//**
+ * Publish the issue.
+ */
     public function publish(Issue $issue)
     {
         // Check if issue has editorial
         if (!$issue->hasEditorial()) {
-            return back()->with('error', 'Cannot publish issue without editorial.');
+            return response()->json(['success' => false, 'message' => 'Cannot publish issue without editorial.'], 400);
         }
         
         // Check if issue has at least one paper
         if ($issue->papers()->count() === 0) {
-            return back()->with('error', 'Cannot publish issue without any papers.');
+            return response()->json(['success' => false, 'message' => 'Cannot publish issue without any papers.'], 400);
         }
         
         $issue->status = 'published';
@@ -187,7 +230,7 @@ class IssueController extends Controller
         // Mark all papers in issue as published
         $issue->papers()->update(['status' => 'published', 'published_at' => now()]);
         
-        return back()->with('success', 'Issue published successfully.');
+        return response()->json(['success' => true, 'message' => 'Issue published successfully.']);
     }
 
     /**
@@ -198,7 +241,7 @@ class IssueController extends Controller
         $issue->status = 'draft';
         $issue->save();
         
-        return back()->with('success', 'Issue unpublished successfully.');
+        return response()->json(['success' => true, 'message' => 'Issue unpublished successfully.']);
     }
 
     /**
@@ -234,6 +277,75 @@ class IssueController extends Controller
         
         return redirect()->route('editor.issues.show', $issue)
             ->with('success', 'Editorial saved successfully.');
+    }
+
+    /**
+ * Add a paper to the issue.
+ */
+    public function addPaper(Request $request, Issue $issue)
+    {
+        $request->validate([
+            'paper_id' => 'required|exists:papers,id',
+            'page_from' => 'required|integer|min:1',
+            'page_to' => 'required|integer|min:1|gte:page_from',
+        ]);
+
+        $paper = Paper::findOrFail($request->paper_id);
+        
+        // Check if paper is accepted and not assigned to another issue
+        if ($paper->status !== 'accepted' || $paper->issue_id) {
+            return back()->with('error', 'Paper cannot be added to this issue.');
+        }
+
+        $paper->update([
+            'issue_id' => $issue->id,
+            'page_from' => $request->page_from,
+            'page_to' => $request->page_to,
+        ]);
+
+        return back()->with('success', 'Paper added to issue successfully.');
+    }
+
+    /**
+     * Update paper page numbers in the issue.
+     */
+    public function updatePaper(Request $request, Issue $issue, Paper $paper)
+    {
+        $request->validate([
+            'page_from' => 'required|integer|min:1',
+            'page_to' => 'required|integer|min:1|gte:page_from',
+        ]);
+
+        // Check if paper belongs to this issue
+        if ($paper->issue_id !== $issue->id) {
+            return back()->with('error', 'Paper does not belong to this issue.');
+        }
+
+        $paper->update([
+            'page_from' => $request->page_from,
+            'page_to' => $request->page_to,
+        ]);
+
+        return back()->with('success', 'Page numbers updated successfully.');
+    }
+
+    /**
+     * Remove a paper from the issue.
+     */
+    public function removePaper(Issue $issue, Paper $paper)
+    {
+        // Check if paper belongs to this issue
+        if ($paper->issue_id !== $issue->id) {
+            return back()->with('error', 'Paper does not belong to this issue.');
+        }
+
+        $paper->update([
+            'issue_id' => null,
+            'page_from' => null,
+            'page_to' => null,
+        ]);
+
+        return back()->with('success', 'Paper removed from issue successfully.');
     }
 }
 

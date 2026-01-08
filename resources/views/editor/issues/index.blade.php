@@ -50,7 +50,7 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#published">
                         Published
                         <span class="badge bg-success ms-1">
-                            {{ $issues->where('status','published')->count() }}
+                            {{ $statusCounts['published'] }}
                         </span>
                     </button>
                 </li>
@@ -58,7 +58,7 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#draft">
                         Draft
                         <span class="badge bg-warning ms-1">
-                            {{ $issues->where('status','draft')->count() }}
+                            {{ $statusCounts['draft'] }}
                         </span>
                     </button>
                 </li>
@@ -66,7 +66,7 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#archived">
                         Archived
                         <span class="badge bg-secondary ms-1">
-                            {{ $issues->where('status','archived')->count() }}
+                            {{ $statusCounts['archived'] }}
                         </span>
                     </button>
                 </li>
@@ -106,7 +106,9 @@
 </div>
 
 {{-- Local Styles --}}
+
 <style>
+
 .nav-pills .nav-link {
     color: var(--foreground);
     background: #f8f9fa;
@@ -126,6 +128,24 @@
 .btn-lift:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+/* Target all SVGs in pagination more aggressively */
+svg[class*="w-5"],
+svg[class*="h-5"],
+.pagination svg,
+nav[role="navigation"] svg {
+    width: 12px !important;
+    height: 12px !important;
+}
+
+/* Target Livewire/Tailwind pagination specifically */
+.relative svg,
+a[rel="prev"] svg,
+a[rel="next"] svg,
+span[aria-hidden="true"] svg {
+    width: 12px !important;
+    height: 12px !important;
 }
 </style>
 @endsection

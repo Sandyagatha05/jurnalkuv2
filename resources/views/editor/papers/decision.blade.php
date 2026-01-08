@@ -140,7 +140,8 @@
                 </div>
 
                 {{-- ===================== DECISION FORM ===================== --}}
-                <form action="{{ route('editor.papers.store-decision', $paper) }}" method="POST">
+                <form action="{{ route('editor.papers.store-decision', $paper) }}" method="POST" onsubmit="event.preventDefault(); 
+                customConfirm('Are you sure you want to submit this decision?').then(result => {if(result) this.submit(); });">
                     @csrf
 
                     <h6 class="fw-semibold border-bottom pb-2 mb-3">

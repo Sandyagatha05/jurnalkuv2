@@ -48,7 +48,6 @@
                             @else
                                 <span class="text-muted">-</span>
                             @endif
-                        </td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
                                 <a href="{{ route('editor.issues.show', $issue) }}" class="btn btn-outline-primary" title="View">
@@ -59,22 +58,34 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 
-                                @if($issue->status == 'draft')
-                                    <button class="btn btn-outline-success" title="Publish"
-                                            onclick="publishIssue({{ $issue->id }})">
-                                        <i class="fas fa-upload"></i>
+                                <!-- Status Change Dropdown -->
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" title="Change Status">
+                                        <i class="fas fa-exchange-alt"></i>
                                     </button>
-                                    
+                                    <ul class="dropdown-menu">
+                                        @if($issue->status !== 'draft')
+                                            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); changeStatus({{ $issue->id }}, 'draft')">
+                                                <i class="fas fa-file text-warning"></i> Set as Draft
+                                            </a></li>
+                                        @endif
+                                        @if($issue->status !== 'published')
+                                            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); changeStatus({{ $issue->id }}, 'published')">
+                                                <i class="fas fa-check text-success"></i> Set as Published
+                                            </a></li>
+                                        @endif
+                                        @if($issue->status !== 'archived')
+                                            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); changeStatus({{ $issue->id }}, 'archived')">
+                                                <i class="fas fa-archive text-secondary"></i> Set as Archived
+                                            </a></li>
+                                        @endif
+                                    </ul>
+                                </div>
+                                
+                                @if($issue->status == 'draft')
                                     <button type="button" class="btn btn-outline-danger" title="Delete"
                                             onclick="deleteIssue({{ $issue->id }})">
                                         <i class="fas fa-trash"></i>
-                                    </button>
-                                @endif
-                                
-                                @if($issue->status == 'published')
-                                    <button class="btn btn-outline-warning" title="Unpublish"
-                                            onclick="unpublishIssue({{ $issue->id }})">
-                                        <i class="fas fa-download"></i>
                                     </button>
                                 @endif
                             </div>
@@ -103,6 +114,58 @@
 
 @push('scripts')
 <script>
+    function changeStatus(issueId, status) {
+    const messages = {
+        'draft': 'set this issue to draft',
+        'published': 'publish this issue',
+        'archived': 'archive this issue'
+    };
+    
+    // If trying to publish, use the existing publish function with checks
+    if (status === 'published') {
+        publishIssue(issueId);
+        return;
+    }
+    
+    // If trying to unpublish (set to draft from published), use unpublish function
+    if (status === 'draft') {
+        // Check if issue is currently published
+        const row = event.target.closest('tr');
+        const currentStatus = row.querySelector('.status-badge')?.textContent?.trim().toLowerCase();
+        
+        if (currentStatus === 'published') {
+            unpublishIssue(issueId);
+            return;
+        }
+    }
+    
+    // For other status changes (like archived), proceed normally
+    customConfirm(`Are you sure you want to ${messages[status]}?`).then(result => {
+        if (result) {
+            fetch(`/editor/issues/${issueId}/change-status`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error changing status');
+                }
+            })
+            .catch(error => {
+                alert('An error occurred');
+                console.error(error);
+            });
+        }
+    });
+}
+
     function publishIssue(issueId) {
         customConfirm('Are you sure you want to publish this issue?').then(result => {
             if (result) {

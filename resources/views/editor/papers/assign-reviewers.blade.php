@@ -42,7 +42,9 @@
                     </div>
                 </div>
 
-                <form action="{{ route('editor.papers.store-assign-reviewers', $paper) }}" method="POST">
+                <form action="{{ route('editor.papers.store-assign-reviewers', $paper) }}" onsubmit="event.preventDefault(); 
+                customConfirm('Are you sure you want to select this reviewer?').then(result => {if(result) this.submit(); });
+                " method="POST">
                     @csrf
 
                     {{-- Reviewer Selection --}}
@@ -179,7 +181,7 @@
 
                     {{-- Actions --}}
                     <div class="d-grid gap-2">
-                        <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary btn-lg">
+                        <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-user-plus me-2"></i> Assign Reviewers & Start Review
                         </button>
                         <a href="{{ route('editor.papers.show', $paper) }}" class="btn btn-outline-secondary">

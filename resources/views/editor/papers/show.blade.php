@@ -191,7 +191,8 @@
                 <h6 class="mb-0"><i class="fas fa-cogs me-2"></i> Paper Management</h6>
             </div>
             <div class="card-body">
-                <form action="{{ route('editor.papers.update-status', $paper) }}" method="POST">
+                <form action="{{ route('editor.papers.update-status', $paper) }}" method="POST" onsubmit="event.preventDefault(); 
+                customConfirm('Are you sure you want to update the status?').then(result => {if(result) this.submit(); })">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Update Status</label>
@@ -205,7 +206,7 @@
                             <option value="published" {{ $paper->status == 'published' ? 'selected' : '' }}>Published</option>
                         </select>
                     </div>
-                    <button onclick="return confirm('Are you sure?')" class="btn btn-primary w-100">Update Status</button>
+                    <button class="btn btn-primary w-100">Update Status</button>
                 </form>
             </div>
         </div>
