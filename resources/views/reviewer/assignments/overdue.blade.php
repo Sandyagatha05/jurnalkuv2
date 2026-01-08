@@ -118,7 +118,7 @@
 <div class="modal fade" id="requestExtensionModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="extensionForm">
+            <form id="extensionForm" onsubmit="event.preventDefault(); customConfirm('Are you sure you want to submit this request?').then(result => {if(result) this.submit();});">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Request Extension</h5>

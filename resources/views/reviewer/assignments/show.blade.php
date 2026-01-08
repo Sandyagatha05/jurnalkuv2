@@ -128,7 +128,8 @@
                                 @if($assignment->status == 'pending')
                                     <div class="row g-2">
                                         <div class="col-6">
-                                            <form action="{{ route('reviewer.assignments.accept', $assignment) }}" method="POST">
+                                            <form action="{{ route('reviewer.assignments.accept', $assignment) }}" method="POST" onsubmit="event.preventDefault();
+                                            customConfirm('Are you sure you want to accept this assignment?').then(result => {if(result) this.submit(); });">
                                                 @csrf
                                                 <button type="submit" class="btn btn-success w-100 fw-bold">
                                                     <i class="fas fa-check-circle me-1"></i> Accept
@@ -136,7 +137,8 @@
                                             </form>
                                         </div>
                                         <div class="col-6">
-                                            <form action="{{ route('reviewer.assignments.decline', $assignment) }}" method="POST">
+                                            <form action="{{ route('reviewer.assignments.decline', $assignment) }}" method="POST" onsubmit="event.preventDefault();
+                                            customConfirm('Are you sure you want to decline this assignment?').then(result => {if(result) this.submit(); });">
                                                 @csrf
                                                 <button type="submit" class="btn btn-danger w-100 fw-bold">
                                                     <i class="fas fa-times-circle me-1"></i> Decline
@@ -273,7 +275,7 @@
                                 @if($isOverdue && $assignment->status != 'completed')
                                     <button class="btn btn-link btn-sm d-block mx-auto mt-2 text-decoration-none" data-bs-toggle="modal" data-bs-target="#extensionModal">
                                         Request Extension
-                                    </button>
+                                    </button> 
                                 @endif
                             </div>
                         @endif
@@ -300,7 +302,8 @@
 <div class="modal fade" id="extensionModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <form action="{{ route('reviewer.assignments.request-extension', $assignment) }}" method="POST">
+            <form action="{{ route('reviewer.assignments.request-extension', $assignment) }}" method="POST" onsubmit="event.preventDefault();
+                customConfirm('Are you sure you want to request an extention?').then(result => {if(result) this.submit(); });">
                 @csrf
                 <div class="modal-header border-bottom">
                     <h5 class="modal-title fw-bold">Request Extension</h5>

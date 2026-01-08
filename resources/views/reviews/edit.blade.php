@@ -28,7 +28,8 @@
                     </p>
                 </div>
                 
-                <form action="{{ route('reviews.update', $review) }}" method="POST">
+                <form action="{{ route('reviews.update', $review) }}" method="POST" onsubmit="event.preventDefault();
+                customConfirm('Are you sure you want to update this review?').then(result => { if(result) this.submit(); });">
                     @csrf
                     @method('PUT')
                     

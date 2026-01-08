@@ -206,7 +206,8 @@
 <div class="modal fade" id="extensionModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('reviewer.assignments.request-extension', $assignment) }}" method="POST">
+            <form action="{{ route('reviewer.assignments.request-extension', $assignment) }}" method="POST" onsubmit="event.preventDefault();
+                customConfirm('Are you sure you want to request an extention?').then(result => {if(result) this.submit(); });">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Request Extension</h5>

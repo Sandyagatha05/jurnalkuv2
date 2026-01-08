@@ -159,25 +159,30 @@
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
 
     function acceptAssignment(assignmentId) {
-        if(confirm('Are you sure you want to accept this review assignment?')) {
-            fetch(`/reviewer/assignments/${assignmentId}/accept`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            }).then(res => res.json()).then(data => {
-                if(data.success) location.reload();
-            }).catch(err => console.error(err));
-        }
+        customConfirm('Are you sure you want to accept this review assignment?').then(result => {
+            if(confirm()) {
+                fetch(`/reviewer/assignments/${assignmentId}/accept`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                }).then(res => res.json()).then(data => {
+                    if(data.success) location.reload();
+                }).catch(err => console.error(err));
+            }
+        });
+
     }
 
     function declineAssignment(assignmentId) {
-        if(confirm('Are you sure you want to decline this review assignment?')) {
-            fetch(`/reviewer/assignments/${assignmentId}/decline`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            }).then(res => res.json()).then(data => {
-                if(data.success) location.reload();
-            }).catch(err => console.error(err));
-        }
+        customConfirm('Are you sure you want to decline this review assignment?').then(result => {
+            if(result) {
+                fetch(`/reviewer/assignments/${assignmentId}/decline`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                }).then(res => res.json()).then(data => {
+                    if(data.success) location.reload();
+                }).catch(err => console.error(err));
+            }
+        });
     }
 </script>
 @endpush

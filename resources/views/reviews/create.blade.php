@@ -26,7 +26,7 @@
                     </p>
                 </div>
                 
-                <form action="{{ route('reviewer.assignments.submit-review', $assignment) }}" method="POST">
+                <form action="{{ route('reviewer.assignments.submit-review', $assignment) }}" method="POST" onsubmit="return handleSubmit(event)">
                     @csrf
                     
                     <!-- Review form sama seperti di edit.blade.php -->
@@ -34,10 +34,10 @@
                     
                     <!-- Submit Buttons -->
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="submit" name="action" value="draft" class="btn btn-secondary">
+                        <button type="submit" name="action" value="draft" class="btn btn-secondary" data-confirm="Save this review as a draft?">
                             <i class="fas fa-save me-2"></i> Save Draft
                         </button>
-                        <button type="submit" name="action" value="submit" class="btn btn-primary">
+                        <button type="submit" name="action" value="submit" class="btn btn-primary" data-confirm="Are you sure you want to submit this review?">
                             <i class="fas fa-paper-plane me-2"></i> Submit Review
                         </button>
                     </div>
@@ -48,4 +48,31 @@
         <!-- Include paper info card dari edit.blade.php -->
     </div>
 </div>
+
+<script>
+let clickedSubmitButton = null;
+
+// capture which button was clicked
+document.addEventListener('click', function (e) {
+    if (e.target.matches('button[type="submit"]')) {
+        clickedSubmitButton = e.target;
+    }
+});
+
+function handleSubmit(event) {
+    event.preventDefault();
+
+    const message = clickedSubmitButton?.dataset.confirm
+        ?? 'Are you sure you want to proceed?';
+
+    customConfirm(message).then(result => {
+        if (result) {
+            event.target.submit();
+        }
+    });
+
+    return false;
+}
+</script>
+
 @endsection

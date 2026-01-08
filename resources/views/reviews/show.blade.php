@@ -173,7 +173,8 @@
                     @endif
                     
                     @if(auth()->user()->hasRole('admin'))
-                        <button class="btn btn-outline-danger" onclick="if(confirm('Delete this review?')) document.getElementById('delete-review').submit()">
+                        <button class="btn btn-outline-danger" onsubmit="event.preventDefault();
+                customConfirm('Are you sure you want to delete this review?').then(result => { if(result) document.getElementById('delete-review').submit(); });">
                             <i class="fas fa-trash me-2"></i> Delete Review
                         </button>
                         
@@ -256,7 +257,8 @@
 <div class="modal fade" id="sendReminderModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('editor.reviews.assignments.remind', $assignment) }}" method="POST">
+            <form action="{{ route('editor.reviews.assignments.remind', $assignment) }}" method="POST" onsubmit="event.preventDefault();
+                customConfirm('Are you sure you want to send a reminder?').then(result => { if(result) this.submit(); });">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Send Reminder</h5>

@@ -67,7 +67,8 @@
                     </div>
                 </div>
 
-                <form action="{{ route('reviewer.assignments.submit-review', $assignment) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('reviewer.assignments.submit-review', $assignment) }}" method="POST" enctype="multipart/form-data" onsubmit="event.preventDefault();
+                customConfirm('Are you sure you want to submit this review?').then(result => {if(result) this.submit(); });">
                     @csrf
                     
                     <div class="mb-4">
