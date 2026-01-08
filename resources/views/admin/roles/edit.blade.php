@@ -33,7 +33,8 @@
                     </div>
                 @endif
 
-                <form action="{{ route('admin.roles.update', $role) }}" method="POST">
+                <form action="{{ route('admin.roles.update', $role) }}" method="POST" 
+                onsubmit="event.preventDefault(); customConfirm('Are you sure you want to update this role?').then(result => { if(result) this.submit(); });">
                     @csrf
                     @method('PUT')
 
@@ -177,9 +178,11 @@
 
     // Confirm Delete
     function confirmDelete(roleId) {
-        if(confirm('Are you sure you want to delete this role?')) {
-            document.getElementById('delete-form-' + roleId).submit();
-        }
+        customConfirm('Are you sure you want to delete this role?<br><br>This action cannot be undone.').then(result => {
+            if(result) {
+                document.getElementById('delete-form-' + roleId).submit();
+            }
+        });
     }
 </script>
 @endpush

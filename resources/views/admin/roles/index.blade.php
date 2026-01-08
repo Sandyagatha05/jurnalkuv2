@@ -93,31 +93,35 @@
         @endif
     </div>
 </div>
+
 @endsection
 
 @push('scripts')
 <script>
 function confirmDelete(roleName, deleteUrl) {
-    if (confirm(`Are you sure you want to delete the role "${roleName}"? This action cannot be undone.`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = deleteUrl;
+    customConfirm(`Are you sure you want to delete the role "${roleName}"?
+    <br>This action cannot be undone.`).then(result => {
+        if (result) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = deleteUrl;
 
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
 
-        const methodField = document.createElement('input');
-        methodField.type = 'hidden';
-        methodField.name = '_method';
-        methodField.value = 'DELETE';
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
 
-        form.appendChild(csrfToken);
-        form.appendChild(methodField);
-        document.body.appendChild(form);
-        form.submit();
-    }
+            form.appendChild(csrfToken);
+            form.appendChild(methodField);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
 }
 </script>
 @endpush

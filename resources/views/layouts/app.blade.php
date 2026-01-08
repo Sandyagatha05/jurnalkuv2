@@ -326,6 +326,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ asset('css/confirmation.css') }}">
+<script src="{{ asset('js/confirmation.js') }}"></script>
 @stack('scripts')
 </body>
 </html>

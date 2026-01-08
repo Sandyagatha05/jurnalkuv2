@@ -29,7 +29,7 @@
                 </div>
                 @endif
 
-                <form action="{{ route('admin.roles.store') }}" method="POST">
+                <form onsubmit="event.preventDefault(); customConfirm('Are you sure you want to create this role?').then(result => { if(result) this.submit(); })" action="{{ route('admin.roles.store') }}" method="POST">
                     @csrf
 
                     <div class="row g-3">
@@ -155,4 +155,7 @@
         </div>
     </div>
 </div>
+<link rel="stylesheet" href="{{ asset('css/confirmation.css') }}">
+<script src="{{ asset('js/confirmation.js') }}"></script>
+
 @endsection

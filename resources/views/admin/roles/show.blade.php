@@ -218,9 +218,11 @@
 @push('scripts')
 <script>
 function confirmDelete(roleId) {
-    if (confirm('Are you sure you want to delete this role? This action cannot be undone.')) {
-        document.getElementById('delete-form-' + roleId).submit();
-    }
+    customConfirm('Are you sure you want to delete this role? <br>This action cannot be undone.').then(result => {
+        if (result) {
+            document.getElementById('delete-form-' + roleId).submit();
+        }
+    });
 }
 </script>
 @endpush
