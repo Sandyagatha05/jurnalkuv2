@@ -25,7 +25,8 @@
                     <h6 class="mb-0"><i class="fas fa-user-edit me-2"></i> Profile Information</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" onsubmit="event.preventDefault();
+                    customConfirm('Are you sure you want to update profile?').then(result => { if(result) this.submit(); });">
                         @csrf
                         @method('PUT')
 
@@ -134,7 +135,7 @@
                         {{-- ACTIONS --}}
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('profile.show') }}" class="btn btn-outline-secondary">Cancel</a>
-                            <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Update Profile</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Update Profile</button>
                         </div>
                     </form>
                 </div>
@@ -146,7 +147,8 @@
                     <h6 class="mb-0"><i class="fas fa-lock me-2"></i> Change Password</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('profile.update-password') }}" method="POST">
+                    <form action="{{ route('profile.update-password') }}" method="POST" onsubmit="event.preventDefault();
+                    customConfirm('Are you sure you want to change your password?').then(result => { if(result) this.submit(); });">
                         @csrf
                         @method('PUT')
 
@@ -184,7 +186,7 @@
                             </div>
 
                             <div class="col-md-6 d-flex align-items-end">
-                                <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary w-100">
+                                <button type="submit" class="btn btn-primary w-100">
                                     <i class="fas fa-key me-1"></i> Update Password
                                 </button>
                             </div>

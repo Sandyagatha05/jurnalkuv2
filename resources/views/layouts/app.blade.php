@@ -309,9 +309,10 @@
 
     <!-- Logout Bottom -->
     <div class="sidebar-footer">
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('logout') }}" onsubmit="event.preventDefault(); customConfirm('Are you sure you want to logout?').then(result => {
+        if(result) this.submit(); });">
             @csrf
-            <button onclick="return confirm('Are you sure?')" class="btn btn-outline-danger w-100">
+            <button class="btn btn-outline-danger w-100">
                 <i class="fas fa-sign-out-alt me-2"></i> Logout
             </button>
         </form>
