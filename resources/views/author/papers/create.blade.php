@@ -22,7 +22,9 @@
         {{-- Main Form Card --}}
         <div class="card shadow-sm mb-4">
             <div class="card-body p-4">
-                <form action="{{ route('author.papers.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('author.papers.store') }}" onsubmit="event.preventDefault(); customConfirm('Are you sure you want to submit this paper?').then(result => {
+                    if(result) this.submit();
+                });" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     {{-- ================= --}}
@@ -151,7 +153,7 @@
                     {{-- Actions --}}
                     {{-- ========= --}}
                     <div class="d-flex gap-2">
-                        <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary btn-lg">
+                        <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-paper-plane me-2"></i> Submit Paper
                         </button>
                         <a href="{{ route('author.papers.index') }}" class="btn btn-outline-secondary btn-lg">

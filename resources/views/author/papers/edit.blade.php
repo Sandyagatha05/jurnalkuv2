@@ -33,7 +33,8 @@
 
                 <form action="{{ route('author.papers.update', $paper) }}"
                       method="POST"
-                      enctype="multipart/form-data">
+                      enctype="multipart/form-data"
+                      onsubmit="event.preventDefault(); customConfirm('Are you sure you want to update this paper?').then(result => { if(result) this.submit(); });">
                     @csrf
                     @method('PUT')
 
@@ -97,7 +98,7 @@
                            class="btn btn-outline-secondary">
                             Cancel
                         </a>
-                        <button onclick="return confirm('Are you sure?')" type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-1"></i> Update Paper
                         </button>
                     </div>

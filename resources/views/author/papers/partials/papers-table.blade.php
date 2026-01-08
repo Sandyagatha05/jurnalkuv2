@@ -58,7 +58,9 @@
                                     </a>
 
                                     <button class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Delete"
-                                            onclick="if(confirm('Are you sure?')) document.getElementById('delete-paper-{{ $paper->id }}').submit()">
+                                            onclick="event.preventDefault();
+                                            customConfirm('Are you sure you want to delete?<br>This action can not be undone.').then(result => { 
+                                            if(result) document.getElementById('delete-paper-{{ $paper->id }}').submit(); });">
                                         <i class="fas fa-trash"></i>
                                     </button>
 

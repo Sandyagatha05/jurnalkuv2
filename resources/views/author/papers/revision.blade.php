@@ -35,7 +35,9 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body p-4">
                 <form action="{{ route('author.papers.submit-revision', $paper) }}"
-                      method="POST" enctype="multipart/form-data">
+                      method="POST" enctype="multipart/form-data"
+                      onsubmit="event.preventDefault(); customConfirm('Are you sure you want to submit this revision?').then(result => {
+                      if(result) this.submit(); });">
                     @csrf
 
                     {{-- ================= --}}
