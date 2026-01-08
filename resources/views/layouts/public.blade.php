@@ -334,7 +334,8 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/disable-spam-clicks.js') }}"></script>
+    <!-- <script src="{{ asset('js/disable-spam-clicks.js') }}"></script> -->
+    <script src="{{ asset('js/loading-overlay.js') }}"></script>
     @stack('scripts')
 </body>
 </html>
