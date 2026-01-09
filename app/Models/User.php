@@ -213,13 +213,22 @@ class User extends Authenticatable
     /**
      * Get user's profile photo URL.
      */
+/**
+     * Get user's profile photo URL.
+     */
     public function getProfilePhotoUrlAttribute()
     {
-        if ($this->photo) {
+        // Check if photo exists and file actually exists in storage
+        if ($this->photo && \Storage::disk('public')->exists($this->photo)) {
             return asset('storage/' . $this->photo);
         }
         
-        // Generate initials avatar
+        // If photo field has value but file doesn't exist in storage, try direct public path
+        if ($this->photo && file_exists(public_path('storage/' . $this->photo))) {
+            return asset('storage/' . $this->photo);
+        }
+        
+        // Generate initials avatar as fallback
         $name = urlencode($this->name);
         $bgColor = substr(md5($this->email), 0, 6);
         return "https://ui-avatars.com/api/?name={$name}&background={$bgColor}&color=fff&size=200";
@@ -261,4 +270,6 @@ class User extends Authenticatable
     {
         return $this->profile_completion >= 80;
     }
+
+    
 }

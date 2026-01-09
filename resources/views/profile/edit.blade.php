@@ -25,8 +25,7 @@
                     <h6 class="mb-0"><i class="fas fa-user-edit me-2"></i> Profile Information</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" onsubmit="event.preventDefault();
-                    customConfirm('Are you sure you want to update profile?').then(result => { if(result) this.submit(); });">
+                    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profileForm">
                         @csrf
                         @method('PUT')
 
@@ -48,7 +47,7 @@
                                         <label class="form-label" for="name">Full Name *</label>
                                         <input type="text" name="name" id="name"
                                                class="form-control @error('name') is-invalid @enderror"
-                                               value="{{ old('name', $user->name) }}" required>
+                                               value="{{ old('name') ?? session('_old_input.name') ?? $user->name }}" required>
                                         @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 
@@ -56,7 +55,7 @@
                                         <label class="form-label" for="email">Email Address *</label>
                                         <input type="email" name="email" id="email"
                                                class="form-control @error('email') is-invalid @enderror"
-                                               value="{{ old('email', $user->email) }}" required>
+                                               value="{{ old('email') ?? session('_old_input.email') ?? $user->email }}" required>
                                         @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 
@@ -64,7 +63,7 @@
                                         <label class="form-label" for="phone">Phone</label>
                                         <input type="tel" name="phone" id="phone"
                                                class="form-control @error('phone') is-invalid @enderror"
-                                               value="{{ old('phone', $user->phone) }}">
+                                               value="{{ old('phone') ?? session('_old_input.phone') ?? $user->phone }}">
                                         @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 
@@ -72,7 +71,7 @@
                                         <label class="form-label" for="institution">Institution</label>
                                         <input type="text" name="institution" id="institution"
                                                class="form-control @error('institution') is-invalid @enderror"
-                                               value="{{ old('institution', $user->institution) }}">
+                                               value="{{ old('institution') ?? session('_old_input.institution') ?? $user->institution }}">
                                         @error('institution')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 
@@ -80,14 +79,14 @@
                                         <label class="form-label" for="department">Department</label>
                                         <input type="text" name="department" id="department"
                                                class="form-control @error('department') is-invalid @enderror"
-                                               value="{{ old('department', $user->department) }}">
+                                               value="{{ old('department') ?? session('_old_input.department') ?? $user->department }}">
                                         @error('department')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 
                                     <div class="col-12">
                                         <label class="form-label" for="address">Address</label>
                                         <textarea name="address" id="address" rows="2"
-                                                  class="form-control @error('address') is-invalid @enderror">{{ old('address', $user->address) }}</textarea>
+                                                  class="form-control @error('address') is-invalid @enderror">{{ old('address') ?? session('_old_input.address') ?? $user->address }}</textarea>
                                         @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
@@ -147,46 +146,60 @@
                     <h6 class="mb-0"><i class="fas fa-lock me-2"></i> Change Password</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('profile.update-password') }}" method="POST" onsubmit="event.preventDefault();
-                    customConfirm('Are you sure you want to change your password?').then(result => { if(result) this.submit(); });">
+                    @if($errors->has('current_password') || $errors->has('password'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Password update failed!</strong> Please check the errors below and try again.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('profile.update-password') }}" method="POST" id="passwordForm">
                         @csrf
                         @method('PUT')
 
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label" for="current_password">Current Password *</label>
                                 <div class="input-group">
-                                    <input type="password" name="current_password" id="current_password" class="form-control" required>
+                                    <input type="password" name="current_password" id="current_password" 
+                                           class="form-control @error('current_password') is-invalid @enderror" required>
                                     <button type="button" class="btn btn-outline-secondary" id="toggleCurrentPassword">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                @error('current_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                @error('current_password')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label" for="password">New Password *</label>
                                 <div class="input-group">
-                                    <input type="password" name="password" id="password" class="form-control" required>
+                                    <input type="password" name="password" id="password" 
+                                           class="form-control @error('password') is-invalid @enderror" required>
                                     <button type="button" class="btn btn-outline-secondary" id="toggleNewPassword">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                @error('password')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label" for="password_confirmation">Confirm New Password *</label>
                                 <div class="input-group">
-                                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
+                                    <input type="password" name="password_confirmation" id="password_confirmation" 
+                                           class="form-control" required>
                                     <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
                             </div>
 
-                            <div class="col-md-6 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-key me-1"></i> Update Password
                                 </button>
                             </div>
@@ -229,6 +242,58 @@
     toggleVisibility('toggleCurrentPassword','current_password');
     toggleVisibility('toggleNewPassword','password');
     toggleVisibility('toggleConfirmPassword','password_confirmation');
+
+    // Handle profile form submission with confirmation
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        customConfirm('Are you sure you want to update your profile?').then(result => {
+            if(result) {
+                this.submit();
+            }
+        });
+    });
+
+    // Handle password form submission with confirmation
+    document.getElementById('passwordForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Store password values in sessionStorage before submission
+        sessionStorage.setItem('pwd_current', document.getElementById('current_password').value);
+        sessionStorage.setItem('pwd_new', document.getElementById('password').value);
+        sessionStorage.setItem('pwd_confirm', document.getElementById('password_confirmation').value);
+        
+        customConfirm('Are you sure you want to change your password?').then(result => {
+            if(result) {
+                this.submit();
+            } else {
+                // Clear storage if user cancels
+                sessionStorage.removeItem('pwd_current');
+                sessionStorage.removeItem('pwd_new');
+                sessionStorage.removeItem('pwd_confirm');
+            }
+        });
+    });
+
+    // Restore password values if there were errors
+    window.addEventListener('DOMContentLoaded', function() {
+        @if($errors->has('current_password') || $errors->has('password'))
+            // Restore values from sessionStorage
+            if(sessionStorage.getItem('pwd_current')) {
+                document.getElementById('current_password').value = sessionStorage.getItem('pwd_current');
+            }
+            if(sessionStorage.getItem('pwd_new')) {
+                document.getElementById('password').value = sessionStorage.getItem('pwd_new');
+            }
+            if(sessionStorage.getItem('pwd_confirm')) {
+                document.getElementById('password_confirmation').value = sessionStorage.getItem('pwd_confirm');
+            }
+        @else
+            // Clear storage on success or initial page load
+            sessionStorage.removeItem('pwd_current');
+            sessionStorage.removeItem('pwd_new');
+            sessionStorage.removeItem('pwd_confirm');
+        @endif
+    });
 </script>
 
 <style>
