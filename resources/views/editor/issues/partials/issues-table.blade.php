@@ -1,5 +1,5 @@
 @if($issues->count() > 0)
-    <div class="table-responsive">
+    <div class="table-responsive" style="overflow: visible;">
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -48,6 +48,7 @@
                             @else
                                 <span class="text-muted">-</span>
                             @endif
+                        </td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
                                 <a href="{{ route('editor.issues.show', $issue) }}" class="btn btn-outline-primary" title="View">
@@ -59,11 +60,11 @@
                                 </a>
                                 
                                 <!-- Status Change Dropdown -->
-                                <div class="btn-group btn-group-sm">
+                                <div class="btn-group btn-group-sm dropdown-container">
                                     <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" title="Change Status">
                                         <i class="fas fa-exchange-alt"></i>
                                     </button>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu dropdown-menu-end">
                                         @if($issue->status !== 'draft')
                                             <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); changeStatus({{ $issue->id }}, 'draft')">
                                                 <i class="fas fa-file text-warning"></i> Set as Draft
@@ -111,6 +112,22 @@
         <p class="text-muted">No issues found in this category.</p>
     </div>
 @endif
+
+<style>
+/* Fix dropdown clipping issue */
+.table-responsive {
+    overflow: visible !important;
+}
+
+.dropdown-container {
+    position: static !important;
+}
+
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 1050 !important;
+}
+</style>
 
 @push('scripts')
 <script>

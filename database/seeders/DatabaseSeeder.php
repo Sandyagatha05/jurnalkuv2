@@ -23,23 +23,21 @@ class DatabaseSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         
         // ========== 0. CLEAR EXISTING DATA ==========
-        // Hapus data yang ada (dalam urutan yang benar karena foreign keys)
-        Review::query()->delete();
-        ReviewAssignment::query()->delete();
-        Editorial::query()->delete();
-        Paper::query()->delete();
-        Issue::query()->delete();
-        User::query()->delete();
-        
-        // Hapus roles dan permissions yang ada
-        Role::query()->delete();
-        Permission::query()->delete();
-        
-        // Reset auto-increment
+        // Truncate all tables to reset auto-increment
         \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        
+        Review::truncate();
+        ReviewAssignment::truncate();
+        Editorial::truncate();
+        Paper::truncate();
+        Issue::truncate();
+        User::truncate();
+        Role::truncate();
+        Permission::truncate();
         \DB::table('model_has_roles')->truncate();
         \DB::table('model_has_permissions')->truncate();
         \DB::table('role_has_permissions')->truncate();
+        
         \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // ========== 1. CREATE ROLES ==========
@@ -50,31 +48,56 @@ class DatabaseSeeder extends Seeder
 
         // ========== 2. CREATE USERS ==========
         
-        // Create 1 Admin
-        $admin = User::factory()->create([
-            'name' => 'System Administrator',
-            'email' => 'admin@jurnalku.com',
+        // Create Admin
+        $admin = User::create([
+            'name' => 'Anderies',
+            'email' => 'ander@jurnalku.com',
             'password' => bcrypt('password123'),
         ]);
         $admin->assignRole('admin');
 
-        // Create 3 Editors
-        $editors = User::factory()->count(3)->create();
-        foreach ($editors as $editor) {
-            $editor->assignRole('editor');
-        }
+        // Create Editor
+        $editor = User::create([
+            'name' => 'Matthew Nathanael',
+            'email' => 'matthew@jurnalku.com',
+            'password' => bcrypt('password123'),
+        ]);
+        $editor->assignRole('editor');
 
-        // Create 10 Reviewers
-        $reviewers = User::factory()->count(10)->create();
-        foreach ($reviewers as $reviewer) {
-            $reviewer->assignRole('reviewer');
-        }
+        // Create Reviewers
+        $reviewer1 = User::create([
+            'name' => 'Nathanael Hosea',
+            'email' => 'hosea@jurnalku.com',
+            'password' => bcrypt('password123'),
+        ]);
+        $reviewer1->assignRole('reviewer');
 
-        // Create 20 Authors
-        $authors = User::factory()->count(20)->create();
-        foreach ($authors as $author) {
-            $author->assignRole('author');
-        }
+        $reviewer2 = User::create([
+            'name' => 'Sandy Agatha',
+            'email' => 'sandy@jurnalku.com',
+            'password' => bcrypt('password123'),
+        ]);
+        $reviewer2->assignRole('reviewer');
+
+        // Create Authors
+        $author1 = User::create([
+            'name' => 'Nicky Marcellino',
+            'email' => 'nicky@jurnalku.com',
+            'password' => bcrypt('password123'),
+        ]);
+        $author1->assignRole('author');
+
+        $author2 = User::create([
+            'name' => 'Vania Oriana',
+            'email' => 'vania@jurnalku.com',
+            'password' => bcrypt('password123'),
+        ]);
+        $author2->assignRole('author');
+
+        // Collect users for later use
+        $editors = collect([$editor]);
+        $reviewers = collect([$reviewer1, $reviewer2]);
+        $authors = collect([$author1, $author2]);
 
         // ========== 3. CREATE ISSUES ==========
         $issues = collect();
@@ -136,14 +159,34 @@ class DatabaseSeeder extends Seeder
             $papers->push($paper);
         }
 
-        // Assign some papers to issues (published papers)
-        $publishedPapers = $papers->random(15);
-        foreach ($publishedPapers as $paper) {
-            $paper->update([
-                'issue_id' => $issues->random()->id,
-                'status' => 'published',
-                'published_at' => now()->subDays(fake()->numberBetween(1, 180)),
-            ]);
+        // Assign papers to published issues
+        $publishedIssues = $issues->where('status', 'published');
+        $availablePapers = $papers->shuffle();
+        $paperIndex = 0;
+        
+        // Ensure each published issue has at least 1 paper
+        foreach ($publishedIssues as $issue) {
+            if ($paperIndex < $availablePapers->count()) {
+                $availablePapers[$paperIndex]->update([
+                    'issue_id' => $issue->id,
+                    'status' => 'published',
+                    'published_at' => $issue->published_date,
+                ]);
+                $paperIndex++;
+            }
+        }
+        
+        // Assign remaining papers randomly to published issues
+        $remainingToPublish = min(10, $availablePapers->count() - $paperIndex);
+        for ($i = 0; $i < $remainingToPublish; $i++) {
+            if ($paperIndex < $availablePapers->count() && $publishedIssues->isNotEmpty()) {
+                $availablePapers[$paperIndex]->update([
+                    'issue_id' => $publishedIssues->random()->id,
+                    'status' => 'published',
+                    'published_at' => now()->subDays(fake()->numberBetween(1, 180)),
+                ]);
+                $paperIndex++;
+            }
         }
 
         // Set status for other papers
@@ -176,8 +219,8 @@ class DatabaseSeeder extends Seeder
         });
         
         foreach ($papersToReview as $paper) {
-            // Assign 2-3 reviewers per paper
-            $numReviewers = fake()->numberBetween(2, 3);
+            // Assign 1-2 reviewers per paper (since we only have 2 reviewers)
+            $numReviewers = fake()->numberBetween(1, 2);
             $assignedReviewers = $reviewers->random($numReviewers);
             
             foreach ($assignedReviewers as $reviewer) {
@@ -224,7 +267,9 @@ class DatabaseSeeder extends Seeder
         echo "Total Reviews: " . Review::count() . "\n";
         
         echo "\n📋 Login Credentials:\n";
-        echo "Admin: admin@jurnalku.com / password123\n";
-        echo "All other users password: password123\n";
+        echo "Admin: ander@jurnalku.com / password123\n";
+        echo "Editor: matthew@jurnalku.com / password123\n";
+        echo "Reviewers: hosea@jurnalku.com, sandy@jurnalku.com / password123\n";
+        echo "Authors: nicky@jurnalku.com, vania@jurnalku.com / password123\n";
     }
 }
